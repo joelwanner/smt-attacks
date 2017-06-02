@@ -12,7 +12,7 @@ SMTAX requires Python 3.0.
 The application relies on the [Z3](http://z3prover.github.io) theorem prover.
 In order to install Z3, follow the [instructions](https://github.com/Z3Prover/z3#python) in the Github repository for the python bindings.
 
-[NetworkX](http://networkx.github.io) is used to generate networks.
+[NetworkX](http://networkx.github.io) is used to generate networks, which are visualized using [pydot][https://github.com/erocarrera/pydot].
 
 ### Usage
 

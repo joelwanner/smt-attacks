@@ -1,0 +1,4 @@
+
+
+class Benchmark(object):
+    pass

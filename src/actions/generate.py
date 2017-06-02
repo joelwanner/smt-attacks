@@ -1,0 +1,4 @@
+
+
+class Generator(object):
+    pass
