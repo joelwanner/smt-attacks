@@ -61,17 +61,17 @@ class Network(object):
     def __init__(self, hosts, links):
         self.hosts = hosts
         self.links = links
-        self.routes = None
+        self.__routes = None
 
         for l in links:
             l.h1.add_link(l)
             l.h2.add_link(l)
 
     def get_routes(self):
-        if not self.routes:
-            self.routes = RoutingTable(self)
+        if not self.__routes:
+            self.__routes = RoutingTable(self)
 
-        return self.routes
+        return self.__routes
 
     def __str__(self):
         host_str = ",\n\t".join([str(h) for h in self.hosts])
