@@ -1,6 +1,8 @@
+from z3 import Context
+
 from network.execution import Execution
-from network.route import *
 from network.network import *
+from smt.model import Model
 
 
 class AttackChecker:
@@ -9,10 +11,10 @@ class AttackChecker:
         self.victim = victim
         self.attackers = attackers
 
-        self.__routes = RoutingTable(network)
-
     def __check_execution(self, execution):
-        raise NotImplementedError
+        ctx = Context()
+        model = Model(ctx, execution, 6)
+        return False
 
     def check(self):
         if not self.attackers or not self.victim:

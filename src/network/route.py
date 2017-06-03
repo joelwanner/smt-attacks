@@ -32,11 +32,16 @@ class RoutingTable(object):
         self.network = network
         self.__compute_routes()
 
+    def get_route(self, src, dest):
+        return self.__table[(src, dest)]
+
     def __compute_routes(self):
         self.__table = {}
 
-        for h in self.network.hosts:
-            self.__routes_from(h)
+        for src in self.network.hosts:
+            routes = self.__routes_from(src)
+            for r in routes.values():
+                self.__table[(src, r.destination)] = r
 
     def __routes_from(self, src):
         routes = {}

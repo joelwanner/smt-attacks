@@ -40,6 +40,7 @@ if __name__ == '__main__':
     if args.example:
         path = os.path.join(EXAMPLES_PATH, args.example + ".txt")
         checker = NetworkChecker.from_file(path)
+        checker.check_attack()
 
     if args.benchmark:
         b = Benchmark()
