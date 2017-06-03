@@ -61,16 +61,9 @@ class Network(object):
             l.h2.add_link(l)
 
     def __str__(self):
-        s = "hosts {\n"
-
-        for h in self.hosts:
-            s += "\t%s\n" % str(h)
-
-        s += "}\nlinks {\n"
-        for l in self.links:
-            s += "\t%s\n" % str(l)
-
-        return s + "}\n"
+        host_str = ",\n\t".join([str(h) for h in self.hosts])
+        link_str = ",\n\t".join([str(l) for l in self.links])
+        return "hosts {\n\t%s\n}\nlinks {\n\t%s\n}" % (host_str, link_str)
 
     @classmethod
     def from_string(cls, s):

@@ -1,7 +1,7 @@
 import re
 
 from network.network import *
-from smt.checker import AttackChecker
+import smt.checker # TODO: remove this workaround for circular dependencies
 
 
 def parse_network(s):
@@ -86,4 +86,4 @@ def parse_attack(s):
         names = [x.strip() for x in attackers_str.split(',')]
         attackers = [h for h in network.hosts if h.name in names]
 
-    return AttackChecker(network, victim, attackers)
+    return smt.checker.AttackChecker(network, victim, attackers)

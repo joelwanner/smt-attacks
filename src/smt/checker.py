@@ -1,6 +1,7 @@
 from network.network import *
 from network.execution import Execution
 
+
 class AttackChecker:
     def __init__(self, network, victim, attackers):
         self.network = network
@@ -39,13 +40,16 @@ class AttackChecker:
         raise NotImplementedError
 
     def to_string(self):
-        network_str = self.network.to_string()
+        s = self.network.to_string() + "\n"
+
         if self.victim:
-            # TODO: include attackers
-            victim_ln = "victim: %s\n" % self.victim.name
-            return network_str + victim_ln
-        else:
-            return network_str
+            s += "victim: %s\n" % self.victim.name
+
+        if self.attackers:
+            attacker_str = ", ".join([str(h) for h in self.attackers])
+            s += "attackers: [%s]\n" % attacker_str
+
+        return s
 
     @classmethod
     def from_string(cls, s):
