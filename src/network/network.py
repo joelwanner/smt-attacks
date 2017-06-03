@@ -1,4 +1,4 @@
-import network.parse as parser
+import io.parse as parser
 
 
 class Host(object):
@@ -7,6 +7,11 @@ class Host(object):
         self.receiving_cap = r
         self.sending_cap = s
         self.amp_factor = a
+
+        self.links = []
+
+    def add_link(self, l):
+        self.links.append(l)
 
     def __str__(self):
         if self.amp_factor == 1:
@@ -50,6 +55,10 @@ class Network(object):
     def __init__(self, hosts, links):
         self.hosts = hosts
         self.links = links
+
+        for l in links:
+            l.h1.add_link(l)
+            l.h2.add_link(l)
 
     def __str__(self):
         s = "hosts {\n"

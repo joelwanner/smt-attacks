@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
         g = Generator(EXAMPLES_PATH)
         g.generate_random(10, 6)
-        g.generate_crafted(range(3, 6))
+        g.generate_crafted(range(2, 6))
 
     if args.example:
         path = os.path.join(EXAMPLES_PATH, args.example + ".txt")

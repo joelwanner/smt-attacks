@@ -1,21 +1,19 @@
 from network.network import *
+from network.execution import Execution
 
-
-# TODO: refactor class such that it uses the new Execution class
-# TODO: outsource string parsing
 class AttackChecker:
-    def __init__(self, network, victim=None, attackers=None):
-        self.__network = network
+    def __init__(self, network, victim, attackers):
+        self.network = network
         self.victim = victim
         self.attackers = attackers
 
-    def __check(self, victim, attackers):
+    def __check(self, execution):
         raise NotImplementedError
 
     def check_attack(self):
         if not self.attackers or not self.victim:
             regular_hosts = []
-            for h in self.__network.hosts:
+            for h in self.network.hosts:
                 if not (isinstance(h, Server) or h == self.victim):
                     regular_hosts.append(h)
         else:
@@ -23,11 +21,14 @@ class AttackChecker:
 
         if self.victim:
             self.attackers = regular_hosts
-            return self.__check(self.victim, regular_hosts)
+            e = Execution(self.network, self.victim, regular_hosts)
+            return self.__check(e)
         else:
-            for v in self.__network.hosts:
+            for v in self.network.hosts:
                 a = [h for h in regular_hosts if h != v]
-                if self.__check(v, a):
+                e = Execution(self.network, v, a)
+
+                if self.__check(e):
                     self.victim = v
                     self.attackers = a
                     return True
@@ -38,7 +39,7 @@ class AttackChecker:
         raise NotImplementedError
 
     def to_string(self):
-        network_str = self.__network.to_string()
+        network_str = self.network.to_string()
         if self.victim:
             # TODO: include attackers
             victim_ln = "victim: %s\n" % self.victim.name
@@ -48,4 +49,4 @@ class AttackChecker:
 
     @classmethod
     def from_string(cls, s):
-        raise NotImplementedError
+        return parser.parse_attack(s)

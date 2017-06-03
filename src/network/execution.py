@@ -1,5 +1,3 @@
-import network.parse as parser
-
 from network.network import *
 
 
@@ -9,7 +7,3 @@ class Execution(object):
         self.__network = network
         self.victim = victim
         self.attackers = attackers
-
-    @classmethod
-    def from_string(cls, s):
-        return parser.parse_attack(s)

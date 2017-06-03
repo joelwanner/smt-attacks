@@ -3,7 +3,8 @@ from network.execution import Execution
 
 
 class AmplificationNetwork(Network):
-    def __init__(self, n_servers, amp_factor):
+    def __init__(self, n_servers):
+        amp_factor = 3
         hosts = []
         links = []
 
