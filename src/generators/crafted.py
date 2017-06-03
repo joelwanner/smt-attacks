@@ -25,8 +25,8 @@ class AmplificationNetwork(Network):
 
 
 class AmplificationAttack(Execution):
-    def __init__(self, n_servers, amp_factor):
-        network = AmplificationNetwork(n_servers, amp_factor)
+    def __init__(self, n_servers):
+        network = AmplificationNetwork(n_servers)
         super().__init__(network, network.victim)
 
 

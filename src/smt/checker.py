@@ -1,8 +1,7 @@
-from z3 import Context
-
 from network.execution import Execution
 from network.network import *
-from smt.model import Model
+from smt.model import *
+from smt.solver import SmtSolver
 
 
 class AttackChecker:
@@ -12,8 +11,12 @@ class AttackChecker:
         self.attackers = attackers
 
     def __check_execution(self, execution):
-        ctx = Context()
-        model = Model(ctx, execution, 6)
+        model = ModelEncoder(execution, 6)
+        assertions = model.get_assertions()
+
+        solver = SmtSolver()
+        solver.solve(assertions)
+
         return False
 
     def check(self):

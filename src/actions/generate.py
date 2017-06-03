@@ -25,5 +25,5 @@ class Generator(object):
                 file.write(network.__str__())
 
     def generate_crafted(self, sizes):
-        self.__generate(AmplificationNetwork, "amplification", sizes)
-        self.__generate(CoremeltNetwork, "coremelt", sizes)
+        self.__generate(AmplificationAttack, "amplification", sizes)
+        self.__generate(CoremeltAttack, "coremelt", sizes)

@@ -2,13 +2,16 @@ import os
 import time
 
 from smt.checker import AttackChecker
+from interface.render import NetworkRenderer
 
 
 # TODO: add checking routine
 class NetworkChecker(object):
-    def __init__(self, checker, name=None, render=True, verbose=False):
+    def __init__(self, checker, path, name=None, verbose=False):
         self.checker = checker
+        self.path = path
         self.name = name
+        self.verbose = verbose
 
     def check_attack(self):
         start_time = time.time()
@@ -21,15 +24,11 @@ class NetworkChecker(object):
         else:
             print("No attack possible.")
 
-        # if name:
-        #     out_prefix = os.path.join(OUTPUT_PATH, name) + "-"
-        #     render_network(checker.get_network(), out_prefix + "network", checker.victim, checker.attackers)
-        #     print("Network rendering is located at " + out_prefix + "network.pdf")
-        #
-        #     if debug:
-        #         graph, flow = checker.get_graph()
-        #         render_graph(graph, out_prefix + "graph")
-        #         render_graph(graph, out_prefix + "graph_flow", flow)
+        if self.name:
+            out_prefix = os.path.join(self.path, self.name) + "-"
+            nr = NetworkRenderer(self.checker.network, self.checker.victim, self.checker.attackers)
+            nr.render(out_prefix + "network")
+            print("Network rendering is located at " + out_prefix + "network.pdf")
 
     @classmethod
     def from_file(cls, path):
