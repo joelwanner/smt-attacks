@@ -1,4 +1,3 @@
-import interface.parse as parser
 
 
 class Host(object):
@@ -36,13 +35,19 @@ class Switch(Server):
         super().__init__(name, r, s, 1)
 
 
-# TODO: remove flow from this class
 class Link(object):
-    def __init__(self, h1, h2, c, f=None):
+    def __init__(self, h1, h2, c):
         self.h1 = h1
         self.h2 = h2
         self.capacity = c
-        self.flow = f
+
+    def get_neighbor(self, h):
+        if h == self.h1:
+            return self.h2
+        elif h == self.h2:
+            return self.h1
+        else:
+            return None
 
     def __repr__(self):
         return "%s--%s" % (self.h1.name, self.h2.name)
@@ -68,3 +73,7 @@ class Network(object):
     @classmethod
     def from_string(cls, s):
         return parser.parse_network(s)
+
+
+# TODO: remove workaround for circular dependencies
+import interface.parse as parser

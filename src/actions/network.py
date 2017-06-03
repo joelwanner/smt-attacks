@@ -12,7 +12,7 @@ class NetworkChecker(object):
 
     def check_attack(self):
         start_time = time.time()
-        attack_found = self.checker.check_attack()
+        attack_found = self.checker.check()
         runtime = time.time() - start_time
         print("Algorithm runtime: %.5fs" % runtime)
 

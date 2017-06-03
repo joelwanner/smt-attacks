@@ -1,7 +1,7 @@
 import re
 
 from network.network import *
-import smt.checker # TODO: remove this workaround for circular dependencies
+import smt.checker
 
 
 def parse_network(s):
