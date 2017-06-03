@@ -9,15 +9,20 @@ class AttackChecker:
         self.network = network
         self.victim = victim
         self.attackers = attackers
+        self.attack = None
 
     def __check_execution(self, execution):
         model = ModelEncoder(execution, 6)
         assertions = model.get_assertions()
 
-        solver = SmtSolver()
-        solver.solve(assertions)
+        solver = SmtSolver(verbose=True)
+        result = solver.solve(assertions)
 
-        return False
+        if result == sat:
+            self.attack = execution
+            return True
+        else:
+            return False
 
     def check(self):
         if not self.attackers or not self.victim:

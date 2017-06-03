@@ -1,5 +1,4 @@
 import os
-import time
 
 from smt.checker import AttackChecker
 from interface.render import NetworkRenderer
@@ -14,10 +13,7 @@ class NetworkChecker(object):
         self.verbose = verbose
 
     def check_attack(self):
-        start_time = time.time()
         attack_found = self.checker.check()
-        runtime = time.time() - start_time
-        print("Algorithm runtime: %.5fs" % runtime)
 
         if attack_found:
             print("Attack found.")
