@@ -1,4 +1,5 @@
 from network.flow import Flow
+from z3 import *
 
 
 class ModelDecoder(object):
@@ -17,17 +18,19 @@ class ModelDecoder(object):
 
     def flows(self):
         m = self.network
-        x = self.model
+        v = self.model
         flows = []
 
         for f in m.flows:
-            fid = x.evaluate(m.Flow.id(f))
-            if x.evaluate(m.state(fid)):
-                src = x.evaluate(m.Flow.src(f))
-                dest = x.evaluate(m.Flow.dest(f))
-                size = x.evaluate(m.Flow.size(f)).as_long()
+            fid = v.evaluate(m.Flow.id(f))
+            if v.evaluate(m.state(fid)):
+                id_str = str(v.evaluate(fid))
+                src = v.evaluate(m.Flow.src(f))
+                dest = v.evaluate(m.Flow.dest(f))
+                size = v.evaluate(m.Flow.size(f)).as_long()
 
+                # We may assume that the routes taken by flows are the pre-computed ones
                 route = m.routes.get_route(self.__host_for_expr(src), self.__host_for_expr(dest))
-                flows.append(Flow(route, size))
+                flows.append(Flow(id_str, route, size))
 
         return flows

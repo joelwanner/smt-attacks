@@ -9,3 +9,15 @@ class Execution(object):
 
     def set_flows(self, flows):
         self.flows = flows
+
+    def __str__(self):
+        s = self.network.__str__() + "\n"
+
+        if self.victim:
+            s += "victim: %s\n" % self.victim.name
+
+        if self.attackers:
+            attacker_str = ", ".join([str(h) for h in self.attackers])
+            s += "attackers: [%s]\n" % attacker_str
+
+        return s

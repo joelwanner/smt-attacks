@@ -26,33 +26,32 @@ class ModelEncoder(object):
 
         for h_src in m.hosts:
             for h_dest in m.hosts:
-                if not h_src == h_dest:
-                    src = m.host_map[h_src]
-                    dest = m.host_map[h_dest]
-                    r = m.fRoute(src, dest)
+                src = m.host_map[h_src]
+                dest = m.host_map[h_dest]
+                r = m.fRoute(src, dest)
 
-                    route = table.get_route(h_src, h_dest)
-                    hops = route.hops
+                route = table.get_route(h_src, h_dest)
+                hops = route.hops
 
-                    if hops:
-                        next_hop = m.host_map[hops[0]]
-                    else:  # This case may occur in disconnected networks
-                        next_hop = src
+                if hops:
+                    next_hop = m.host_map[hops[0]]
+                else:  # This case may occur in disconnected networks
+                    next_hop = src
 
-                    set_constraints = []
-                    for host in m.hosts:
-                        h = m.host_map[host]
-                        membership = Select(r, h)
+                set_constraints = []
+                for host in m.hosts:
+                    h = m.host_map[host]
+                    membership = Select(r, h)
 
-                        if host in hops or host == h_src:
-                            set_constraints.append(membership)
-                        else:
-                            set_constraints.append(Not(membership))
+                    if host in hops or host == h_src:
+                        set_constraints.append(membership)
+                    else:
+                        set_constraints.append(Not(membership))
 
-                    rule_next = m.fNext(src, dest) == next_hop
-                    rule_route = And(set_constraints)
+                rule_next = m.fNext(src, dest) == next_hop
+                rule_route = And(set_constraints)
 
-                    yield And(rule_next, rule_route)
+                yield And(rule_next, rule_route)
 
     # (F3) Flow request field constraints
     # -------------------------------------------
@@ -148,7 +147,7 @@ class ModelEncoder(object):
             if not h == m.victim:
                 yield self.__mk_units_recvd(h) <= h.receiving_cap
             else:  # Attack property
-                yield self.__mk_units_recvd(h) == h.receiving_cap
+                yield self.__mk_units_recvd(h) > h.receiving_cap
 
             if h not in m.attackers:
                 yield self.__mk_units_sent(h) <= h.sending_cap

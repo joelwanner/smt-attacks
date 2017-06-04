@@ -11,7 +11,7 @@ class Generator(object):
     def __generate(self, cls, name, sizes):
         for n in sizes:
             network = cls(n)
-            path = os.path.join(self.path, "%s%d.txt" % (name, n + 1))
+            path = os.path.join(self.path, "%s%d.txt" % (name, n))
 
             with open(path, "w") as file:
                 file.write(network.__str__())
@@ -19,7 +19,7 @@ class Generator(object):
     def generate_random(self, n_networks, n_hosts):
         for n in range(n_networks):
             network = RandomNetwork(n_hosts)
-            path = os.path.join(self.path, "random%d.txt" % (n + 1))
+            path = os.path.join(self.path, "random%d.txt" % n)
 
             with open(path, "w") as file:
                 file.write(network.__str__())

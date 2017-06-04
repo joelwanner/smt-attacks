@@ -11,7 +11,7 @@ class Route(object):
             self.hops = []
 
     def __contains__(self, item):
-        return item in self.hops
+        return item in self.hops or item == self.source
 
     def add_hop(self, h):
         self.hops.append(h)

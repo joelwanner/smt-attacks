@@ -25,7 +25,10 @@ class NetworkChecker(object):
             out_prefix = os.path.join(out_path, self.name) + "-"
             nr = NetworkRenderer(self.checker.network, self.checker.attack)
             nr.render(out_prefix + "network")
-            print("Network rendering is located at " + out_prefix + "network.pdf")
+
+            log.print_subsep()
+            print("Network rendering is located at:\n" + out_prefix + "network.pdf")
+            log.print_sep()
 
     @classmethod
     def from_file(cls, path, verbose):

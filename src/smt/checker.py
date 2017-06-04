@@ -56,18 +56,6 @@ class AttackChecker:
 
             return False
 
-    def to_string(self):
-        s = self.network.to_string() + "\n"
-
-        if self.victim:
-            s += "victim: %s\n" % self.victim.name
-
-        if self.attackers:
-            attacker_str = ", ".join([str(h) for h in self.attackers])
-            s += "attackers: [%s]\n" % attacker_str
-
-        return s
-
     @classmethod
     def from_string(cls, s):
         return parser.parse_attack(s)

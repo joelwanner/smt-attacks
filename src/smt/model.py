@@ -47,7 +47,7 @@ class Model(object):
         self.fRoute = Function('route', Host, Host, Route)
         self.fNext = Function('next', Host, Host, Host)
 
-        self.state = Function('s', FlowId, BoolSort())
+        self.state = Function('state', FlowId, BoolSort())
 
         # Set public fields
         # --------------------------
