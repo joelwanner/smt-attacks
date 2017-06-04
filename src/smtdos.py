@@ -1,9 +1,9 @@
 import argparse
 import os
 
-from actions.network import NetworkChecker
-from actions.benchmark import Benchmark
+from actions.check import NetworkChecker
 from actions.generate import Generator
+from actions.benchmark import run_benchmarks
 from smt.check import AttackChecker
 from generators.random import RandomNetwork
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         checker.check_attack(OUTPUT_PATH)
 
     if args.benchmark:
-        b = Benchmark()
+        run_benchmarks(EXAMPLES_PATH, OUTPUT_PATH)
 
     if args.random:
         network = RandomNetwork(int(args.random))

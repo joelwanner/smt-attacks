@@ -17,7 +17,7 @@ class NetworkChecker(object):
         attack_found = self.checker.check()
 
         if attack_found:
-            print("Attack found on %s." % self.checker.attack.victim)
+            print("Attack found on %s." % self.checker.attack.victim.__repr__())
         else:
             print("No attack possible.")
 

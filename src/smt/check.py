@@ -7,6 +7,9 @@ from smt.solve import *
 
 class AttackChecker:
     def __init__(self, network, n_flows, victim=None, attackers=None):
+        if n_flows <= 0:
+            raise ValueError("Invalid number of flows specified")
+
         self.network = network
         self.n_flows = n_flows
         self.victim = victim
@@ -43,12 +46,13 @@ class AttackChecker:
 
         if self.victim:
             self.attackers = regular_hosts
-            e = Execution(self.network, self.victim, regular_hosts)
+            e = Execution(self.network, self.n_flows, self.victim, regular_hosts)
             return self.__check_execution(e)
         else:
             for v in self.network.hosts:
+                print("Looking for attacks on victim %s" % v.__repr__())
                 a = [h for h in regular_hosts if h != v]
-                e = Execution(self.network, v, a)
+                e = Execution(self.network, self.n_flows, v, a)
 
                 if self.__check_execution(e):
                     self.victim = v
