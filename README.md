@@ -1,6 +1,6 @@
-# SMTAX
+# SMTDoS
 
-SMTAX is a tool to find possible Denial-of-Service attacks in networks using the Z3 theorem prover.
+SMTDoS is a tool to find possible Denial-of-Service attacks in networks using the Z3 theorem prover.
 This is the code repository for the thesis *An SMT-Based Approach to Synthesizing Unknown Network Attacks*.
 
 ## Getting Started
@@ -21,7 +21,7 @@ Clone the repository to install SMTAX.
 For a list of commands, use
 
 ```
-python smtax.py --help
+python smtdos.py --help
 ```
 
 ### Benchmarks
@@ -29,8 +29,8 @@ python smtax.py --help
 Generate network files for benchmarking and run them using the following commands:
 
 ```
-python smtax.py --generate
-python smtax.py --benchmark
+python smtdos.py --generate
+python smtdos.py --benchmark
 ```
 
 ## Authors
