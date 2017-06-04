@@ -56,7 +56,7 @@ class RoutingTable(object):
             h = current.pop()
 
             for l in h.links:
-                neighbor = l.get_neighbor(h)
+                neighbor = l.neighbor(h)
                 if neighbor not in visited:
                     r = routes[neighbor]
                     r.add_route(routes[h])

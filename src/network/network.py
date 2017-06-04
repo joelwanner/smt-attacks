@@ -42,7 +42,7 @@ class Link(object):
         self.h2 = h2
         self.capacity = c
 
-    def get_neighbor(self, h):
+    def neighbor(self, h):
         if h == self.h1:
             return self.h2
         elif h == self.h2:

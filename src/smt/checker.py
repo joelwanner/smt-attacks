@@ -1,7 +1,7 @@
 from network.execution import Execution
 from network.network import *
-from smt.model import *
-from smt.solver import SmtSolver
+from smt.encode import ModelEncoder
+from smt.solver import *
 
 
 class AttackChecker:
@@ -20,6 +20,7 @@ class AttackChecker:
 
         if result == sat:
             self.attack = execution
+            print(solver.model)
             return True
         else:
             return False
