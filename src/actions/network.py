@@ -17,21 +17,27 @@ class NetworkChecker(object):
         attack_found = self.checker.check()
 
         if attack_found:
-            print("Attack found.")
+            print("Attack found on %s." % self.checker.attack.victim)
         else:
             print("No attack possible.")
 
         if self.name:
+            if attack_found:
+                attack = self.checker.attack
+            else:
+                attack = None
+
             out_prefix = os.path.join(out_path, self.name) + "-"
-            nr = NetworkRenderer(self.checker.network, self.checker.attack)
+            nr = NetworkRenderer(self.checker.network, attack)
             nr.render(out_prefix + "network")
 
             log.print_subsep()
             print("Network rendering is located at:\n" + out_prefix + "network.pdf")
-            log.print_sep()
+
+        log.print_sep()
 
     @classmethod
-    def from_file(cls, path, verbose):
+    def from_file(cls, path, n_flows, verbose=False):
         file = open(path, "r")
         filename = os.path.splitext(os.path.basename(path))[0]
 
@@ -42,7 +48,7 @@ class NetworkChecker(object):
             if verbose:
                 print(s)
 
-            checker = AttackChecker.from_string(s)
+            checker = AttackChecker.from_string(s, n_flows)
             return cls(checker, filename, verbose)
 
         except SyntaxError as e:

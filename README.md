@@ -21,7 +21,7 @@ Clone the repository to install SMTAX.
 For a list of commands, use
 
 ```
-python smtdos.py --help
+python src/smtdos.py --help
 ```
 
 ### Benchmarks
@@ -29,8 +29,8 @@ python smtdos.py --help
 Generate network files for benchmarking and run them using the following commands:
 
 ```
-python smtdos.py --generate
-python smtdos.py --benchmark
+python src/smtdos.py --generate
+python src/smtdos.py --benchmark
 ```
 
 ## Authors

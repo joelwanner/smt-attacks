@@ -19,7 +19,7 @@ class SmtSolver(object):
         s.set('smt.restart_strategy', 0)  # Restart strategy: geometric
         s.set('smt.restart_factor', 1.5)  # Increase restart threshold multiplication factor (geometric progression)
         s.set('smt.arith.random_initial_value', True)  # Use random initial values in procedure for linear arithmetic
-        s.set('smt.case_split', 3)        # Case split based on relevancy (structural splitting)
+        # s.set('smt.case_split', 3)        # Case split based on relevancy (structural splitting)
         s.set('smt.delay_units', True)    # Prevent Z3 from restarting when a unit clause is learned
         s.set('sk_hack', True)            # Enable hack for VCC
         s.set('smt.qi.eager_threshold', 100.0)  # Increase threshold for eager quantifier instantiation (default: 10.0)
@@ -27,7 +27,7 @@ class SmtSolver(object):
         for a in assertions:
             s.add(a)
 
-        log.print_header("Solving formula...")
+        log.print_subheader("Solving formula...")
 
         if self.verbose:
             print(s)
@@ -37,21 +37,22 @@ class SmtSolver(object):
         runtime = time.time() - start_time
 
         if self.verbose:
-            log.print_header("Done. Runtime: %.3fs" % runtime, "Statistics:")
+            log.print_subheader("Statistics:")
             print(s.statistics())
-        else:
-            log.print_header("Done. Runtime: %.3fs" % runtime)
 
         if result == sat:
-            log.print_header("Satisfiable")
+            log.print_subheader("Satisfiable.")
             self.model = s.model()
 
             if self.verbose:
                 print(self.model)
                 log.print_sep()
         elif result == unsat:
-            log.print_header("Unatisfiable")
+            log.print_subheader("Unatisfiable.")
         else:
-            log.print_header("Unknown")
+            log.print_subheader("Unknown.")
+
+        log.print_subsep()
+        print("Runtime: %.3fs" % runtime)
 
         return result

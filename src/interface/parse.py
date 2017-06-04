@@ -67,10 +67,14 @@ def parse_network(s):
     return Network(hosts, links)
 
 
-def parse_attack(s):
+def parse_attack(s, n_flows):
     network = Network.from_string(s)
     victim = None
     attackers = None
+
+    flow_search = re.search(r"flows\s*:\s*(\d+)", s)
+    if flow_search:
+        n_flows = int(flow_search.groups()[0])
 
     victim_search = re.search(r"victim\s*:\s*([^\s]*)", s)
     if victim_search:
@@ -86,4 +90,4 @@ def parse_attack(s):
         names = [x.strip() for x in attackers_str.split(',')]
         attackers = [h for h in network.hosts if h.name in names]
 
-    return smt.checker.AttackChecker(network, victim, attackers)
+    return smt.checker.AttackChecker(network, n_flows, victim, attackers)

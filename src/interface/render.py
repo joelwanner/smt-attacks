@@ -35,26 +35,26 @@ class NetworkRenderer(object):
             n.set_fontsize(self.node_fontsize)
 
             if type(h) is Server:
-                if h == self.execution.victim:
+                if self.execution and h == self.execution.victim:
                     n.set_shape("doublecircle")
                 else:
                     n.set_shape("Mcircle")
 
                 n.set_fillcolor(self.server_color)
             elif type(h) is Switch:
-                if h == self.execution.victim:
+                if self.execution and h == self.execution.victim:
                     n.set_shape("doubleoctagon")
                 else:
                     n.set_shape("octagon")
 
                 n.set_fillcolor(self.server_color)
             else:
-                if h == self.execution.victim:
+                if self.execution and h == self.execution.victim:
                     n.set_shape("doublecircle")
                 else:
                     n.set_shape("circle")
 
-                if self.execution.attackers and h in self.execution.attackers:
+                if self.execution and h in self.execution.attackers:
                     n.set_fillcolor(self.attacker_color)
                 else:
                     n.set_fillcolor(self.host_color)
@@ -63,7 +63,7 @@ class NetworkRenderer(object):
             node_map[h] = n
 
         for l in self.network.links:
-            if self.execution.flows:
+            if self.execution:
                 flow = sum([f.across_link(l) for f in self.execution.flows])
             else:
                 flow = 0

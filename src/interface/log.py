@@ -2,12 +2,20 @@ __SEPARATOR = "=========================================================="
 __SUBSEP = "----------------------------------------------------------"
 
 
-def print_header(title, subtitle=None):
-    print(__SEPARATOR)
+def __print_header(title, subtitle, separator):
+    print(separator)
     print(title)
     if subtitle:
         print(subtitle)
-    print(__SEPARATOR)
+    print(separator)
+
+
+def print_header(title, subtitle=None):
+    __print_header(title, subtitle, __SEPARATOR)
+
+
+def print_subheader(title, subtitle=None):
+    __print_header(title, subtitle, __SUBSEP)
 
 
 def print_sep():

@@ -20,14 +20,20 @@ if __name__ == '__main__':
     parser.add_argument("--random")
 
     parser.add_argument("--debug", action='store_true')
+    parser.add_argument("-n")
 
     args = parser.parse_args()
 
     if not os.path.exists(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
 
+    if args.n:
+        n_flows = int(args.n)
+    else:
+        n_flows = 10
+
     if args.f:
-        checker = NetworkChecker.from_file(args.f)
+        checker = NetworkChecker.from_file(args.f, n_flows, verbose=args.debug)
 
     if args.generate:
         if not os.path.exists(EXAMPLES_PATH):
@@ -39,7 +45,7 @@ if __name__ == '__main__':
 
     if args.example:
         path = os.path.join(EXAMPLES_PATH, args.example + ".txt")
-        checker = NetworkChecker.from_file(path, verbose=args.debug)
+        checker = NetworkChecker.from_file(path, n_flows, verbose=args.debug)
         checker.check_attack(OUTPUT_PATH)
 
     if args.benchmark:

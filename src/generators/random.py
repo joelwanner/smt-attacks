@@ -16,8 +16,8 @@ class RandomNetwork(Network):
 
         for node in g.nodes():
             name = string.ascii_uppercase[node]
-            r = random.randint(6, 8)
-            s = random.randint(1, 2)
+            r = random.randint(2, 6)
+            s = random.randint(1, 4)
 
             kind = random.randint(0, 5)
             if kind == 2:
@@ -34,7 +34,7 @@ class RandomNetwork(Network):
             h1 = node_map[edge[0]]
             h2 = node_map[edge[1]]
 
-            l = Link(h1, h2, random.randint(1, 4))
+            l = Link(h1, h2, random.randint(1, 10))
             links.append(l)
 
         super().__init__(hosts, links)
