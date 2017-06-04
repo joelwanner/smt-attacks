@@ -6,7 +6,7 @@ from smt.solve import *
 
 
 class AttackChecker:
-    def __init__(self, network, n_flows, victim, attackers):
+    def __init__(self, network, n_flows, victim=None, attackers=None):
         self.network = network
         self.n_flows = n_flows
         self.victim = victim

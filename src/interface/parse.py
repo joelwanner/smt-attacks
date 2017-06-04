@@ -1,7 +1,7 @@
 import re
 
 from network.network import *
-import smt.checker
+import smt.check
 
 
 def parse_network(s):
@@ -90,4 +90,4 @@ def parse_attack(s, n_flows):
         names = [x.strip() for x in attackers_str.split(',')]
         attackers = [h for h in network.hosts if h.name in names]
 
-    return smt.checker.AttackChecker(network, n_flows, victim, attackers)
+    return smt.check.AttackChecker(network, n_flows, victim, attackers)

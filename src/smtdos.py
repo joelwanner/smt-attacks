@@ -4,6 +4,8 @@ import os
 from actions.network import NetworkChecker
 from actions.benchmark import Benchmark
 from actions.generate import Generator
+from smt.check import AttackChecker
+from generators.random import RandomNetwork
 
 
 EXAMPLES_PATH = "examples/"
@@ -34,6 +36,7 @@ if __name__ == '__main__':
 
     if args.f:
         checker = NetworkChecker.from_file(args.f, n_flows, verbose=args.debug)
+        checker.check_attack(OUTPUT_PATH)
 
     if args.generate:
         if not os.path.exists(EXAMPLES_PATH):
@@ -52,5 +55,7 @@ if __name__ == '__main__':
         b = Benchmark()
 
     if args.random:
-        n = int(args.random)
-        # TODO: create random network and check for attack
+        network = RandomNetwork(int(args.random))
+        attack = AttackChecker(network, n_flows)
+        checker = NetworkChecker(attack, "random", verbose=args.debug)
+        checker.check_attack(OUTPUT_PATH)

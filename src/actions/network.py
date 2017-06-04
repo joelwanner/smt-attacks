@@ -1,7 +1,7 @@
 import os
 
 import interface.log as log
-from smt.checker import AttackChecker
+from smt.check import AttackChecker
 from interface.render import NetworkRenderer
 
 
