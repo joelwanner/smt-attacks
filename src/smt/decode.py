@@ -1,4 +1,3 @@
-from smt.model import *
 from network.flow import Flow
 
 
@@ -27,6 +26,7 @@ class ModelDecoder(object):
                 src = x.evaluate(m.Flow.src(f))
                 dest = x.evaluate(m.Flow.dest(f))
                 size = x.evaluate(m.Flow.size(f)).as_long()
+
                 route = m.routes.get_route(self.__host_for_expr(src), self.__host_for_expr(dest))
                 flows.append(Flow(route, size))
 

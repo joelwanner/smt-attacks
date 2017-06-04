@@ -1,5 +1,5 @@
-__SEPARATOR = "=============================================="
-__SUBSEP = "----------------------------------------------"
+__SEPARATOR = "=========================================================="
+__SUBSEP = "----------------------------------------------------------"
 
 
 def print_header(title, subtitle=None):
@@ -7,6 +7,10 @@ def print_header(title, subtitle=None):
     print(title)
     if subtitle:
         print(subtitle)
+    print(__SEPARATOR)
+
+
+def print_sep():
     print(__SEPARATOR)
 
 

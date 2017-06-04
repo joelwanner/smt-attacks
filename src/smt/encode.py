@@ -137,8 +137,6 @@ class ModelEncoder(object):
                     n_is_next_hop = n == m.fNext(h, dest)
                     condition = And(f_is_active, h_in_route, n_is_next_hop)
 
-                    # TODO: compare efficiency
-                    # yield And(Implies(condition, result == size), Implies(Not(condition), result == 0))
                     yield result == If(condition, size, 0)
 
     # (C2) Host sending and receiving capacities

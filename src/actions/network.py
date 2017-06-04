@@ -1,13 +1,15 @@
 import os
 
+import interface.log as log
 from smt.checker import AttackChecker
 from interface.render import NetworkRenderer
 
 
-# TODO: add checking routine
 class NetworkChecker(object):
     def __init__(self, checker, name=None, verbose=False):
         self.checker = checker
+        checker.verbose = verbose
+
         self.name = name
         self.verbose = verbose
 
@@ -26,13 +28,19 @@ class NetworkChecker(object):
             print("Network rendering is located at " + out_prefix + "network.pdf")
 
     @classmethod
-    def from_file(cls, path):
+    def from_file(cls, path, verbose):
         file = open(path, "r")
         filename = os.path.splitext(os.path.basename(path))[0]
 
+        log.print_header("Running example '%s'" % filename, path)
+
         try:
-            checker = AttackChecker.from_string(file.read())
-            return cls(checker, filename)
+            s = file.read()
+            if verbose:
+                print(s)
+
+            checker = AttackChecker.from_string(s)
+            return cls(checker, filename, verbose)
 
         except SyntaxError as e:
             print("Syntax error in file: " + str(e))

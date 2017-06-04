@@ -10,13 +10,15 @@ class AttackChecker:
         self.network = network
         self.victim = victim
         self.attackers = attackers
+
         self.attack = None
+        self.verbose = False
 
     def __check_execution(self, execution):
         encoder = ModelEncoder(execution, 6)
         assertions = encoder.get_assertions()
 
-        solver = SmtSolver(verbose=True)
+        solver = SmtSolver(verbose=self.verbose)
         result = solver.solve(assertions)
 
         if result == sat:

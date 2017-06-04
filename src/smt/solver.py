@@ -1,7 +1,7 @@
 import time
 
 from z3 import *
-from interface.log import *
+import interface.log as log
 
 
 class SmtSolver(object):
@@ -27,24 +27,31 @@ class SmtSolver(object):
         for a in assertions:
             s.add(a)
 
-        print_header("Starting solver....")
+        log.print_header("Solving formula...")
+
+        if self.verbose:
+            print(s)
 
         start_time = time.time()
         result = s.check()
         runtime = time.time() - start_time
 
         if self.verbose:
-            print_header("Done. Runtime: %.3fs" % runtime, "Statistics:")
+            log.print_header("Done. Runtime: %.3fs" % runtime, "Statistics:")
             print(s.statistics())
         else:
-            print_header("Done. Runtime: %.3fs" % runtime)
+            log.print_header("Done. Runtime: %.3fs" % runtime)
 
         if result == sat:
-            print_header("Satisfiable")
+            log.print_header("Satisfiable")
             self.model = s.model()
+
+            if self.verbose:
+                print(self.model)
+                log.print_sep()
         elif result == unsat:
-            print_header("Unatisfiable")
+            log.print_header("Unatisfiable")
         else:
-            print_header("Unknown")
+            log.print_header("Unknown")
 
         return result
