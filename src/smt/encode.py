@@ -1,12 +1,10 @@
-from z3 import *
-
-from smt.model import Model
+from smt.model import *
 from network.network import *
 
 
-class ModelEncoder(Model):
+class ModelEncoder(object):
     def __init__(self, execution, n_flows):
-        super().__init__(execution, n_flows)
+        self.model = Model(execution, n_flows)
 
     # --------------------- #
     #      Constraints      #
@@ -15,33 +13,35 @@ class ModelEncoder(Model):
     # (F1) Inverse fId projection function
     # -------------------------------------------
     def __encode_f1(self):
-        for i, f in enumerate(self.flows):
-            yield self.fpIdInv(self.fids[i]) == f
+        m = self.model
+
+        for i, f in enumerate(m.flows):
+            yield m.fpIdInv(m.fids[i]) == f
 
     # (F2) Routing table setup
     # -------------------------------------------
     def __encode_f2(self):
-        constraints = []
-        table = self.network.get_routes()
+        m = self.model
+        table = m.routes
 
-        for h_src in self.network.hosts:
-            for h_dest in self.network.hosts:
+        for h_src in m.hosts:
+            for h_dest in m.hosts:
                 if not h_src == h_dest:
-                    src = self.host_map[h_src]
-                    dest = self.host_map[h_dest]
-                    r = self.fRoute(src, dest)
+                    src = m.host_map[h_src]
+                    dest = m.host_map[h_dest]
+                    r = m.fRoute(src, dest)
 
                     route = table.get_route(h_src, h_dest)
                     hops = route.hops
 
                     if hops:
-                        next_hop = self.host_map[hops[0]]
+                        next_hop = m.host_map[hops[0]]
                     else:  # This case may occur in disconnected networks
                         next_hop = src
 
                     set_constraints = []
-                    for host in self.network.hosts:
-                        h = self.host_map[host]
+                    for host in m.hosts:
+                        h = m.host_map[host]
                         membership = Select(r, h)
 
                         if host in hops or host == h_src:
@@ -49,7 +49,7 @@ class ModelEncoder(Model):
                         else:
                             set_constraints.append(Not(membership))
 
-                    rule_next = self.fNext(src, dest) == next_hop
+                    rule_next = m.fNext(src, dest) == next_hop
                     rule_route = And(set_constraints)
 
                     yield And(rule_next, rule_route)
@@ -57,84 +57,84 @@ class ModelEncoder(Model):
     # (F3) Flow request field constraints
     # -------------------------------------------
     def __encode_f3(self):
-        Flow = self.s_Flow
+        m = self.model
 
-        for f in self.flows:
-            rid = Flow.req(f)
-            r = self.fpIdInv(rid)
+        for f in m.flows:
+            rid = m.Flow.req(f)
+            r = m.fpIdInv(rid)
 
-            f_is_response = Flow.type(f) == self.RESPONSE
-            r_is_request = Flow.type(r) == self.REQUEST
-            host_matches = Flow.src(f) == Flow.dest(r)
+            f_is_response = m.Flow.type(f) == m.RESPONSE
+            r_is_request = m.Flow.type(r) == m.REQUEST
+            host_matches = m.Flow.src(f) == m.Flow.dest(r)
             distinct = Not(f == r)
 
             # Ensure that there is no other response that is mapped to the same request
-            is_lone_response = And([Not(Flow.req(g) == rid) for g in self.flows if not g == f])
+            is_lone_response = And([Not(m.Flow.req(g) == rid) for g in m.flows if not g == f])
 
             yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
 
     # (G1) General rules for instances of flows
     # -------------------------------------------
     def __encode_g1(self):
-        Flow = self.s_Flow
+        m = self.model
 
-        servers = [h for h in self.network.hosts if type(h) is Server]
-        switches = [h for h in self.network.hosts if type(h) is Switch]
+        servers = [h for h in m.hosts if type(h) is Server]
+        switches = [h for h in m.hosts if type(h) is Switch]
 
-        for f in self.flows:
-            src = Flow.src(f)
-            dest = Flow.dest(f)
+        for f in m.flows:
+            src = m.Flow.src(f)
+            dest = m.Flow.dest(f)
 
             distinct = Not(src == dest)
-            positive_size = Flow.size(f) > 0
+            positive_size = m.Flow.size(f) > 0
 
-            is_request = Flow.type(f) == self.REQUEST
-            not_from_server = And([Not(src == self.host_map[s]) for s in servers])
+            is_request = m.Flow.type(f) == m.REQUEST
+            not_from_server = And([Not(src == m.host_map[s]) for s in servers])
             server_rule = Implies(is_request, not_from_server)
 
-            switch_rule = And([Not(src == self.host_map[s]) for s in switches])
+            switch_rule = And([Not(src == m.host_map[s]) for s in switches])
 
             yield And(distinct, positive_size, server_rule, switch_rule)
 
     # (G2) Amplification factor constraints
     # -------------------------------------------
     def __encode_g2(self):
-        Flow = self.s_Flow
+        m = self.model
 
-        for host in self.network.hosts:
-            h = self.host_map[host]
+        for host in m.hosts:
+            h = m.host_map[host]
 
-            if len(self.flows) > 1:
-                for f in self.flows:
-                    r = self.fpIdInv(Flow.req(f))
+            if len(m.flows) > 1:
+                for f in m.flows:
+                    r = m.fpIdInv(m.Flow.req(f))
 
-                    is_response = Flow.type(f) == self.RESPONSE
-                    belongs_to_host = Flow.src(f) == h
-                    amp_constraint = Flow.size(f) <= Flow.size(r) * host.amp_factor
+                    is_response = m.Flow.type(f) == m.RESPONSE
+                    belongs_to_host = m.Flow.src(f) == h
+                    amp_constraint = m.Flow.size(f) <= m.Flow.size(r) * host.amp_factor
 
                     yield Implies(And(is_response, belongs_to_host), amp_constraint)
 
     # (C1) Definition of sent() function
     # -------------------------------------------
     def __encode_c1(self):
-        Flow = self.s_Flow
+        m = self.model
 
-        for host in self.network.hosts:
-            h = self.host_map[host]
+        for host in m.hosts:
+            h = m.host_map[host]
             for l in host.links:
-                n = self.host_map[l.neighbor(host)]
+                n = m.host_map[l.neighbor(host)]
 
-                for i, f in enumerate(self.flows):
-                    fid = self.fids[i]
-                    src = Flow.src(f)
-                    dest = Flow.dest(f)
+                for i, f in enumerate(m.flows):
+                    fid = m.fids[i]
+                    src = m.Flow.src(f)
+                    dest = m.Flow.dest(f)
 
-                    size = Flow.size(f)
-                    result = self.fSent(h, n, fid)
+                    size = m.Flow.size(f)
+                    result = m.fSent(h, n, fid)
 
-                    f_is_active = self.state(f)
-                    h_in_route = Select(self.fRoute(src, dest), h)
-                    n_is_next_hop = n == self.fNext(h, dest)
+                    f_is_active = m.state(fid)
+                    h_in_route = Select(m.fRoute(src, dest), h)
+                    n_is_next_hop = n == m.fNext(h, dest)
                     condition = And(f_is_active, h_in_route, n_is_next_hop)
 
                     # TODO: compare efficiency
@@ -144,11 +144,15 @@ class ModelEncoder(Model):
     # (C2) Host sending and receiving capacities
     # -------------------------------------------
     def __encode_c2(self):
-        for h in self.network.hosts:
-            if not h == self.victim:
-                yield self.__mk_units_recvd(h) <= h.receiving_cap
+        m = self.model
 
-            if h not in self.attackers:
+        for h in m.hosts:
+            if not h == m.victim:
+                yield self.__mk_units_recvd(h) <= h.receiving_cap
+            else:  # Attack property
+                yield self.__mk_units_recvd(h) == h.receiving_cap
+
+            if h not in m.attackers:
                 yield self.__mk_units_sent(h) <= h.sending_cap
             else:  # Continuous sending property
                 yield self.__mk_units_sent(h) == h.sending_cap
@@ -156,7 +160,8 @@ class ModelEncoder(Model):
     # (C3) Link capacities
     # -------------------------------------------
     def __encode_c3(self):
-        for l in self.network.links:
+        m = self.model
+        for l in m.links:
             yield self.__mk_units_sent_to(l.h1, l.h2) + self.__mk_units_sent_to(l.h2, l.h1) <= l.capacity
 
     # --------------------- #
@@ -164,7 +169,8 @@ class ModelEncoder(Model):
     # --------------------- #
 
     def __mk_units_sent_to(self, src, dest):
-        return Sum([self.fSent(self.host_map[src], self.host_map[dest], fid) for fid in self.fids])
+        m = self.model
+        return Sum([m.fSent(m.host_map[src], m.host_map[dest], fid) for fid in m.fids])
 
     def __mk_units_sent(self, host):
         # TODO: does this work for disconnected hosts?

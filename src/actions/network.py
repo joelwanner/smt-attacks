@@ -6,13 +6,12 @@ from interface.render import NetworkRenderer
 
 # TODO: add checking routine
 class NetworkChecker(object):
-    def __init__(self, checker, path, name=None, verbose=False):
+    def __init__(self, checker, name=None, verbose=False):
         self.checker = checker
-        self.path = path
         self.name = name
         self.verbose = verbose
 
-    def check_attack(self):
+    def check_attack(self, out_path):
         attack_found = self.checker.check()
 
         if attack_found:
@@ -21,8 +20,8 @@ class NetworkChecker(object):
             print("No attack possible.")
 
         if self.name:
-            out_prefix = os.path.join(self.path, self.name) + "-"
-            nr = NetworkRenderer(self.checker.network, self.checker.victim, self.checker.attackers)
+            out_prefix = os.path.join(out_path, self.name) + "-"
+            nr = NetworkRenderer(self.checker.network, self.checker.attack)
             nr.render(out_prefix + "network")
             print("Network rendering is located at " + out_prefix + "network.pdf")
 

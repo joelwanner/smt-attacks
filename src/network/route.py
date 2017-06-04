@@ -10,6 +10,9 @@ class Route(object):
         else:
             self.hops = []
 
+    def __contains__(self, item):
+        return item in self.hops
+
     def add_hop(self, h):
         self.hops.append(h)
 

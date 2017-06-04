@@ -1,6 +1,7 @@
 from network.execution import Execution
 from network.network import *
 from smt.encode import ModelEncoder
+from smt.decode import ModelDecoder
 from smt.solver import *
 
 
@@ -12,15 +13,18 @@ class AttackChecker:
         self.attack = None
 
     def __check_execution(self, execution):
-        model = ModelEncoder(execution, 6)
-        assertions = model.get_assertions()
+        encoder = ModelEncoder(execution, 6)
+        assertions = encoder.get_assertions()
 
         solver = SmtSolver(verbose=True)
         result = solver.solve(assertions)
 
         if result == sat:
             self.attack = execution
-            print(solver.model)
+            smt_model = solver.model
+
+            decoder = ModelDecoder(encoder.model, smt_model)
+            self.attack.flows = decoder.flows()
             return True
         else:
             return False

@@ -27,6 +27,8 @@ class SmtSolver(object):
         for a in assertions:
             s.add(a)
 
+        print_header("Starting solver....")
+
         start_time = time.time()
         result = s.check()
         runtime = time.time() - start_time

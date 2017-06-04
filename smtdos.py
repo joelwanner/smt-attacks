@@ -4,6 +4,7 @@ import os
 from actions.network import NetworkChecker
 from actions.benchmark import Benchmark
 from actions.generate import Generator
+from interface.log import *
 
 
 EXAMPLES_PATH = "examples/"
@@ -39,8 +40,9 @@ if __name__ == '__main__':
 
     if args.example:
         path = os.path.join(EXAMPLES_PATH, args.example + ".txt")
+        print_header("Running example '%s'" % args.example, path)
         checker = NetworkChecker.from_file(path)
-        checker.check_attack()
+        checker.check_attack(OUTPUT_PATH)
 
     if args.benchmark:
         b = Benchmark()

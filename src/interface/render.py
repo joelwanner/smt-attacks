@@ -13,17 +13,16 @@ class NetworkRenderer(object):
     label_size = 10
     node_fontsize = 8
 
-    def __init__(self, network, victim=None, attackers=None):
+    def __init__(self, network, execution=None):
         self.network = network
-        self.victim = victim
-        self.attackers = attackers
+        self.execution = execution
 
-        self.graph = self.convert_graph()
+        self.graph = self.create_graph()
 
     def render(self, output):
         self.graph.write_pdf(output + ".pdf")
 
-    def convert_graph(self):
+    def create_graph(self):
         g = pydot.Dot(graph_type='graph')
         node_map = {}
 
@@ -36,26 +35,26 @@ class NetworkRenderer(object):
             n.set_fontsize(self.node_fontsize)
 
             if type(h) is Server:
-                if h == self.victim:
+                if h == self.execution.victim:
                     n.set_shape("doublecircle")
                 else:
                     n.set_shape("Mcircle")
 
                 n.set_fillcolor(self.server_color)
             elif type(h) is Switch:
-                if h == self.victim:
+                if h == self.execution.victim:
                     n.set_shape("doubleoctagon")
                 else:
                     n.set_shape("octagon")
 
                 n.set_fillcolor(self.server_color)
             else:
-                if h == self.victim:
+                if h == self.execution.victim:
                     n.set_shape("doublecircle")
                 else:
                     n.set_shape("circle")
 
-                if self.attackers and h in self.attackers:
+                if self.execution.attackers and h in self.execution.attackers:
                     n.set_fillcolor(self.attacker_color)
                 else:
                     n.set_fillcolor(self.host_color)
@@ -64,7 +63,11 @@ class NetworkRenderer(object):
             node_map[h] = n
 
         for l in self.network.links:
-            f = l.flow
+            if self.execution.flows:
+                flow = sum([f.across_link(l) for f in self.execution.flows])
+            else:
+                flow = 0
+
             h1 = node_map[l.h1]
             h2 = node_map[l.h2]
 
@@ -72,11 +75,11 @@ class NetworkRenderer(object):
             e.set_fontname(self.font_name)
             e.set_fontsize(self.label_size)
 
-            if f is not None and f > 0:
-                if f % 1 == 0:  # integer flow
-                    e.set_label("%d/%d" % (f, l.capacity))
+            if flow > 0:
+                if flow % 1 == 0:  # integer flow
+                    e.set_label("%d/%d" % (flow, l.capacity))
                 else:
-                    e.set_label("%.2f/%d" % (f, l.capacity))
+                    e.set_label("%.2f/%d" % (flow, l.capacity))
 
                 e.set_fontcolor(self.accent_color)
                 e.set_color(self.accent_color)
