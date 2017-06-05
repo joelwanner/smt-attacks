@@ -85,7 +85,7 @@ class ModelEncoder(object):
             dest = m.Flow.dest(f)
 
             distinct = Not(src == dest)
-            positive_size = m.Flow.size(f) > 0
+            positive_size = m.Flow.size(f) >= 0
 
             is_request = m.Flow.type(f) == m.REQUEST
             not_from_server = And([Not(src == m.host_map[s]) for s in servers])
@@ -131,10 +131,9 @@ class ModelEncoder(object):
                     size = m.Flow.size(f)
                     result = m.fSent(h, n, fid)
 
-                    f_is_active = m.state(fid)
                     h_in_route = Select(m.fRoute(src, dest), h)
                     n_is_next_hop = n == m.fNext(h, dest)
-                    condition = And(f_is_active, h_in_route, n_is_next_hop)
+                    condition = And(h_in_route, n_is_next_hop)
 
                     yield result == If(condition, size, 0)
 
