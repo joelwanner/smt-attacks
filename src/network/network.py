@@ -31,7 +31,7 @@ class Server(Host):
         return "_" + super().__str__()
 
 
-class Switch(Server):
+class Router(Server):
     def __init__(self, name, r, s):
         super().__init__(name, r, s, 1)
 

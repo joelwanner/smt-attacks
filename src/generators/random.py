@@ -23,7 +23,7 @@ class RandomNetwork(Network):
             if kind == 2:
                 h = Server(name, r * 4, s * 2, random.randint(1, 4))
             elif kind == 1:
-                h = Switch(name, r * 2, s * 2)
+                h = Router(name, r * 2, s * 2)
             else:
                 h = Host(name, r, s)
 

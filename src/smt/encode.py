@@ -78,7 +78,7 @@ class ModelEncoder(object):
         m = self.model
 
         servers = [h for h in m.hosts if type(h) is Server]
-        switches = [h for h in m.hosts if type(h) is Switch]
+        switches = [h for h in m.hosts if type(h) is Router]
 
         for f in m.flows:
             src = m.Flow.src(f)

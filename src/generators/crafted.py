@@ -35,7 +35,7 @@ class CoremeltNetwork(Network):
         hosts = []
         links = []
 
-        s = Switch("S", 100, 100)
+        s = Router("S", 100, 100)
         hosts.append(s)
         self.victim = s
 

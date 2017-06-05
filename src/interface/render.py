@@ -41,7 +41,7 @@ class NetworkRenderer(object):
                     n.set_shape("Mcircle")
 
                 n.set_fillcolor(self.server_color)
-            elif type(h) is Switch:
+            elif type(h) is Router:
                 if self.execution and h == self.execution.victim:
                     n.set_shape("doubleoctagon")
                 else:

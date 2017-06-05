@@ -34,7 +34,7 @@ def parse_network(s):
                 if len(attrs) == 3:
                     h = Server(name[1:], rc, sc, amp)
                 else:
-                    h = Switch(name[1:], rc, sc)
+                    h = Router(name[1:], rc, sc)
             else:
                 h = Host(name, rc, sc, amp)
 
