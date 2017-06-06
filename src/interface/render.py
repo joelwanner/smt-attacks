@@ -88,7 +88,11 @@ class NetworkRenderer(object):
                 f1 = sum([f.get(l.h1, l.h2) for f in self.execution.flows])
                 f2 = sum([f.get(l.h2, l.h1) for f in self.execution.flows])
                 residual = l.capacity - f1 - f2
-                e.set_label("%d/%d" % (residual, l.capacity))
+
+                if residual == l.capacity:
+                    e.set_label(str(l.capacity))
+                else:
+                    e.set_label("%d/%d" % (residual, l.capacity))
 
                 if residual <= 0:
                     e.set_color(self.light_color)

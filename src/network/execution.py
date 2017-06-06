@@ -16,7 +16,7 @@ class Execution(object):
         s = "%s\nflows: %d\n" % (self.network.__str__(), self.n_flows)
 
         if self.victims:
-            victims_str = ", ".join([h.name for h in self.victims])
+            victims_str = ", ".join([v.__repr__() for v in self.victims])
             s += "victims: [%s]\n" % victims_str
 
         if self.attackers:

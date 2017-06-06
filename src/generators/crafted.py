@@ -35,18 +35,22 @@ class CoremeltNetwork(Network):
         hosts = []
         links = []
 
-        s = Router("S", 100, 100)
-        hosts.append(s)
-        self.victim = s
+        s1 = Router("S1", 100, 100)
+        s2 = Router("S2", 100, 100)
+        hosts.extend([s1, s2])
+
+        l = Link(s1, s2, 2 * n)
+        links.append(l)
+        self.victim = l
 
         for i in range(n):
-            a = Host("A" + str(i + 1), 10 + i/2, 2 + i/3)
+            a = Host("A" + str(i + 1), 10, 10)
             hosts.append(a)
-            links.append(Link(a, s, 20))
+            links.append(Link(a, s1, 20))
 
-            b = Host("B" + str(i + 1), 5 + i/4, 3 + i/4)
+            b = Host("B" + str(i + 1), 20, 10)
             hosts.append(b)
-            links.append(Link(s, b, 10))
+            links.append(Link(s2, b, 10))
 
         super().__init__(hosts, links)
 
