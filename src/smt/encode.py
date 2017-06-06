@@ -10,17 +10,9 @@ class ModelEncoder(object):
     #      Constraints      #
     # --------------------- #
 
-    # (F1) Inverse fId projection function
+    # (F1) Routing table setup
     # -------------------------------------------
     def __encode_f1(self):
-        m = self.model
-
-        for i, f in enumerate(m.flows):
-            yield m.fpIdInv(m.fids[i]) == f
-
-    # (F2) Routing table setup
-    # -------------------------------------------
-    def __encode_f2(self):
         m = self.model
         table = m.routes
 
@@ -53,9 +45,9 @@ class ModelEncoder(object):
 
                 yield And(rule_next, rule_route)
 
-    # (F3) Definition of sent function
+    # (F2) Definition of sent function
     # -------------------------------------------
-    def __encode_f3(self):
+    def __encode_f2(self):
         m = self.model
 
         for host in m.hosts:
@@ -63,13 +55,12 @@ class ModelEncoder(object):
             for l in host.links:
                 n = m.host_map[l.neighbor(host)]
 
-                for i, f in enumerate(m.flows):
-                    fid = m.fids[i]
+                for f in m.flows:
                     src = m.Flow.src(f)
                     dest = m.Flow.dest(f)
 
                     size = m.Flow.size(f)
-                    result = m.fSent(h, n, fid)
+                    result = m.fSent(h, n, f)
 
                     h_in_route = Select(m.fRoute(src, dest), h)
                     n_is_next_hop = n == m.fNext(h, dest)
@@ -106,8 +97,7 @@ class ModelEncoder(object):
         m = self.model
 
         for f in m.flows:
-            rid = m.Flow.req(f)
-            r = m.fpIdInv(rid)
+            r = m.fReq(f)
 
             f_is_response = m.Flow.type(f) == m.RESPONSE
             r_is_request = m.Flow.type(r) == m.REQUEST
@@ -115,7 +105,7 @@ class ModelEncoder(object):
             distinct = Not(f == r)
 
             # Ensure that there is no other response that is mapped to the same request
-            is_lone_response = And([Not(m.Flow.req(g) == rid) for g in m.flows if not g == f])
+            is_lone_response = And([Not(m.fReq(g) == r) for g in m.flows if not g == f])
 
             yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
 
@@ -129,7 +119,7 @@ class ModelEncoder(object):
 
             if len(m.flows) > 1:
                 for f in m.flows:
-                    r = m.fpIdInv(m.Flow.req(f))
+                    r = m.fReq(f)
 
                     is_response = m.Flow.type(f) == m.RESPONSE
                     belongs_to_host = m.Flow.src(f) == h
@@ -166,7 +156,7 @@ class ModelEncoder(object):
 
     def __mk_units_sent_to(self, src, dest):
         m = self.model
-        return Sum([m.fSent(m.host_map[src], m.host_map[dest], fid) for fid in m.fids])
+        return Sum([m.fSent(m.host_map[src], m.host_map[dest], f) for f in m.flows])
 
     def __mk_units_sent(self, host):
         return Sum([self.__mk_units_sent_to(host, l.neighbor(host)) for l in host.links])
@@ -192,7 +182,7 @@ class ModelEncoder(object):
     #    Public Functions    #
     # ---------------------- #
     def get_assertions(self):
-        a = self.__collect_assertions(self.__encode_f1, self.__encode_f2, self.__encode_f3,
+        a = self.__collect_assertions(self.__encode_f1, self.__encode_f2,
                                       self.__encode_g1, self.__encode_g2, self.__encode_g3,
                                       self.__encode_c1, self.__encode_c2)
         return a

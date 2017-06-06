@@ -21,17 +21,16 @@ class ModelDecoder(object):
         v = self.model
         flows = []
 
-        for f in m.flows:
-            fid = v.evaluate(m.Flow.id(f))
+        for i, f in enumerate(m.flows):
             size = v.evaluate(m.Flow.size(f)).as_long()
 
             if size > 0:
-                id_str = str(v.evaluate(fid))
+                fid = "f%d" % i
                 src = v.evaluate(m.Flow.src(f))
                 dest = v.evaluate(m.Flow.dest(f))
 
                 # We may assume that the routes taken by flows are the pre-computed ones
                 route = m.routes.get_route(self.__host_for_expr(src), self.__host_for_expr(dest))
-                flows.append(Flow(id_str, route, size))
+                flows.append(Flow(fid, route, size))
 
         return flows
