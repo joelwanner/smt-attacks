@@ -22,37 +22,50 @@ class NetworkRenderer(object):
     def render(self, output):
         self.graph.write_pdf(output + ".pdf")
 
+    def __create_link_flow(self, h1, h2, f):
+        e = pydot.Edge(h1, h2)
+        e.set_fontname(self.font_name)
+        e.set_fontsize(self.label_size)
+
+        if f % 1 == 0:  # integer flow
+            e.set_label(str(f))
+        else:
+            e.set_label("%.2f" % f)
+
+        e.set_fontcolor(self.accent_color)
+        e.set_color(self.accent_color)
+
+        return e
+
     def create_graph(self):
-        g = pydot.Dot(graph_type='graph')
+        g = pydot.Dot(graph_type='digraph')
         node_map = {}
 
         for h in self.network.hosts:
             label = "<<B>%s</B><br/>%d  %d<br/>%d>" % (h.name, h.receiving_cap, h.sending_cap, h.amp_factor)
 
-            n = pydot.Node(h.name, label=label, margin=-0.8, width=0.5, height=0.5)
-            n.set_style("filled")
-            n.set_fontname(self.font_name)
-            n.set_fontsize(self.node_fontsize)
+            n = pydot.Node(h.name, label=label, style='filed', margin=-0.8, width=0.5, height=0.5,
+                           fontname=self.font_name, fontsize=self.node_fontsize)
 
             if type(h) is Server:
                 if self.execution and h in self.execution.victims:
-                    n.set_shape("doublecircle")
+                    n.set_shape('doublecircle')
                 else:
-                    n.set_shape("Mcircle")
+                    n.set_shape('Mcircle')
 
                 n.set_fillcolor(self.server_color)
             elif type(h) is Router:
                 if self.execution and h in self.execution.victims:
-                    n.set_shape("doubleoctagon")
+                    n.set_shape('doubleoctagon')
                 else:
-                    n.set_shape("octagon")
+                    n.set_shape('octagon')
 
                 n.set_fillcolor(self.server_color)
             else:
                 if self.execution and h in self.execution.victims:
-                    n.set_shape("doublecircle")
+                    n.set_shape('doublecircle')
                 else:
-                    n.set_shape("circle")
+                    n.set_shape('circle')
 
                 if self.execution and h in self.execution.attackers:
                     n.set_fillcolor(self.attacker_color)
@@ -63,29 +76,25 @@ class NetworkRenderer(object):
             node_map[h] = n
 
         for l in self.network.links:
-            if self.execution:
-                flow = sum([f.across_link(l) for f in self.execution.flows])
-            else:
-                flow = 0
+            f1 = sum([f.get(l.h1, l.h2) for f in self.execution.flows])
+            f2 = sum([f.get(l.h2, l.h1) for f in self.execution.flows])
+            residual = l.capacity - f1 - f2
 
-            h1 = node_map[l.h1]
-            h2 = node_map[l.h2]
+            v1 = node_map[l.h1]
+            v2 = node_map[l.h2]
 
-            e = pydot.Edge(h1, h2)
-            e.set_fontname(self.font_name)
-            e.set_fontsize(self.label_size)
-
-            if flow > 0:
-                if flow % 1 == 0:  # integer flow
-                    e.set_label("%d/%d" % (flow, l.capacity))
-                else:
-                    e.set_label("%.2f/%d" % (flow, l.capacity))
-
-                e.set_fontcolor(self.accent_color)
-                e.set_color(self.accent_color)
-            else:
-                e.set_label(str(l.capacity))
-
+            e = pydot.Edge(v1, v2, dir='none', label="%d/%d" % (residual, l.capacity),
+                           fontname=self.font_name, fontsize=self.label_size)
+            if residual == 0:
+                e.set_color(self.light_color)
+                e.set_fontcolor(self.light_color)
             g.add_edge(e)
+
+            if self.execution:
+                if f1 > 0:
+                    g.add_edge(self.__create_link_flow(v1, v2, f1))
+
+                if f2 > 0:
+                    g.add_edge(self.__create_link_flow(v2, v1, f2))
 
         return g

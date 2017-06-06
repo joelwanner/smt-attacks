@@ -60,10 +60,11 @@ class AttackChecker:
                     potential_victims = self.network.hosts
 
             # Perform first check to see which hosts can be attacked
-            print("Looking for attacks on potential victims %s" % potential_victims)
+            print("Looking for attacks on %s" % potential_victims)
             attack = self.__check_execution(Execution(self.network, self.n_flows, potential_attackers, self.attackers))
 
             if attack:
+                print("Potential victims: %s" % attack.victims)
                 if len(attack.victims) == 1:
                     return [attack]
 

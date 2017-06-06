@@ -30,7 +30,9 @@ class ModelDecoder(object):
                 dest = v.evaluate(m.Flow.dest(f))
 
                 # We may assume that the routes taken by flows are the pre-computed ones
+                print("%s -> %s" % (src, dest))
                 route = m.routes.get_route(self.__host_for_expr(src), self.__host_for_expr(dest))
+                print(route.hops)
                 flows.append(Flow(fid, route, size))
 
         return flows

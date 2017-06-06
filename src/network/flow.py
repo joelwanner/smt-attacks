@@ -10,10 +10,7 @@ class Flow(object):
         return self.id
 
     def get(self, src, dest):
-        if src in self.route and dest in self.route:
+        if self.route.successor(src) == dest:
             return self.amount
         else:
             return 0
-
-    def across_link(self, l):
-        return self.get(l.h1, l.h2)

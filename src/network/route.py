@@ -13,6 +13,17 @@ class Route(object):
     def __contains__(self, item):
         return item in self.hops or item == self.source
 
+    def successor(self, h):
+        target = h == self.source
+
+        for hop in self.hops:
+            if target:
+                return hop
+            elif hop == h:
+                target = True
+
+        return None
+
     def add_hop(self, h):
         self.hops.append(h)
 
