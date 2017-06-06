@@ -76,21 +76,23 @@ class NetworkRenderer(object):
             node_map[h] = n
 
         for l in self.network.links:
-            f1 = sum([f.get(l.h1, l.h2) for f in self.execution.flows])
-            f2 = sum([f.get(l.h2, l.h1) for f in self.execution.flows])
-            residual = l.capacity - f1 - f2
-
             v1 = node_map[l.h1]
             v2 = node_map[l.h2]
 
-            e = pydot.Edge(v1, v2, dir='none', label="%d/%d" % (residual, l.capacity),
+            e = pydot.Edge(v1, v2, dir='none', label=str(l.capacity),
                            fontname=self.font_name, fontsize=self.label_size)
-            if residual == 0:
-                e.set_color(self.light_color)
-                e.set_fontcolor(self.light_color)
             g.add_edge(e)
 
             if self.execution:
+                f1 = sum([f.get(l.h1, l.h2) for f in self.execution.flows])
+                f2 = sum([f.get(l.h2, l.h1) for f in self.execution.flows])
+                residual = l.capacity - f1 - f2
+                e.set_label("%d/%d" % (residual, l.capacity))
+
+                if residual == 0:
+                    e.set_color(self.light_color)
+                    e.set_fontcolor(self.light_color)
+
                 if f1 > 0:
                     g.add_edge(self.__create_link_flow(v1, v2, f1))
 
