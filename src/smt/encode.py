@@ -45,9 +45,27 @@ class ModelEncoder(object):
 
                 yield And(rule_next, rule_route)
 
-    # (F2) Definition of sent function
+    # (F2) Flow request field constraints
     # -------------------------------------------
     def __encode_f2(self):
+        m = self.model
+
+        for f in m.flows:
+            r = m.fReq(f)
+
+            f_is_response = m.Flow.type(f) == m.RESPONSE
+            r_is_request = m.Flow.type(r) == m.REQUEST
+            host_matches = m.Flow.src(f) == m.Flow.dest(r)
+            distinct = Not(f == r)
+
+            # Ensure that there is no other response that is mapped to the same request
+            is_lone_response = And([Not(m.fReq(g) == r) for g in m.flows if not g == f])
+
+            yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
+
+    # (F3) Definition of sent function
+    # -------------------------------------------
+    def __encode_f3(self):
         m = self.model
 
         for host in m.hosts:
@@ -91,27 +109,9 @@ class ModelEncoder(object):
 
             yield And(distinct, positive_size, server_rule, switch_rule)
 
-    # (G2) Flow request field constraints
+    # (G2) Amplification factor constraints
     # -------------------------------------------
     def __encode_g2(self):
-        m = self.model
-
-        for f in m.flows:
-            r = m.fReq(f)
-
-            f_is_response = m.Flow.type(f) == m.RESPONSE
-            r_is_request = m.Flow.type(r) == m.REQUEST
-            host_matches = m.Flow.src(f) == m.Flow.dest(r)
-            distinct = Not(f == r)
-
-            # Ensure that there is no other response that is mapped to the same request
-            is_lone_response = And([Not(m.fReq(g) == r) for g in m.flows if not g == f])
-
-            yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
-
-    # (G3) Amplification factor constraints
-    # -------------------------------------------
-    def __encode_g3(self):
         m = self.model
 
         for host in m.hosts:
@@ -182,7 +182,7 @@ class ModelEncoder(object):
     #    Public Functions    #
     # ---------------------- #
     def get_assertions(self):
-        a = self.__collect_assertions(self.__encode_f1, self.__encode_f2,
-                                      self.__encode_g1, self.__encode_g2, self.__encode_g3,
+        a = self.__collect_assertions(self.__encode_f1, self.__encode_f2, self.__encode_f3,
+                                      self.__encode_g1, self.__encode_g2,
                                       self.__encode_c1, self.__encode_c2)
         return a
