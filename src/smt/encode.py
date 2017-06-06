@@ -53,24 +53,29 @@ class ModelEncoder(object):
 
                 yield And(rule_next, rule_route)
 
-    # (F3) Flow request field constraints
+    # (F3) Definition of sent function
     # -------------------------------------------
     def __encode_f3(self):
         m = self.model
 
-        for f in m.flows:
-            rid = m.Flow.req(f)
-            r = m.fpIdInv(rid)
+        for host in m.hosts:
+            h = m.host_map[host]
+            for l in host.links:
+                n = m.host_map[l.neighbor(host)]
 
-            f_is_response = m.Flow.type(f) == m.RESPONSE
-            r_is_request = m.Flow.type(r) == m.REQUEST
-            host_matches = m.Flow.src(f) == m.Flow.dest(r)
-            distinct = Not(f == r)
+                for i, f in enumerate(m.flows):
+                    fid = m.fids[i]
+                    src = m.Flow.src(f)
+                    dest = m.Flow.dest(f)
 
-            # Ensure that there is no other response that is mapped to the same request
-            is_lone_response = And([Not(m.Flow.req(g) == rid) for g in m.flows if not g == f])
+                    size = m.Flow.size(f)
+                    result = m.fSent(h, n, fid)
 
-            yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
+                    h_in_route = Select(m.fRoute(src, dest), h)
+                    n_is_next_hop = n == m.fNext(h, dest)
+                    condition = And(h_in_route, n_is_next_hop)
+
+                    yield result == If(condition, size, 0)
 
     # (G1) General rules for instances of flows
     # -------------------------------------------
@@ -95,9 +100,28 @@ class ModelEncoder(object):
 
             yield And(distinct, positive_size, server_rule, switch_rule)
 
-    # (G2) Amplification factor constraints
+    # (G2) Flow request field constraints
     # -------------------------------------------
     def __encode_g2(self):
+        m = self.model
+
+        for f in m.flows:
+            rid = m.Flow.req(f)
+            r = m.fpIdInv(rid)
+
+            f_is_response = m.Flow.type(f) == m.RESPONSE
+            r_is_request = m.Flow.type(r) == m.REQUEST
+            host_matches = m.Flow.src(f) == m.Flow.dest(r)
+            distinct = Not(f == r)
+
+            # Ensure that there is no other response that is mapped to the same request
+            is_lone_response = And([Not(m.Flow.req(g) == rid) for g in m.flows if not g == f])
+
+            yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
+
+    # (G3) Amplification factor constraints
+    # -------------------------------------------
+    def __encode_g3(self):
         m = self.model
 
         for host in m.hosts:
@@ -113,33 +137,9 @@ class ModelEncoder(object):
 
                     yield Implies(And(is_response, belongs_to_host), amp_constraint)
 
-    # (C1) Definition of sent() function
+    # (C1) Host sending and receiving capacities
     # -------------------------------------------
     def __encode_c1(self):
-        m = self.model
-
-        for host in m.hosts:
-            h = m.host_map[host]
-            for l in host.links:
-                n = m.host_map[l.neighbor(host)]
-
-                for i, f in enumerate(m.flows):
-                    fid = m.fids[i]
-                    src = m.Flow.src(f)
-                    dest = m.Flow.dest(f)
-
-                    size = m.Flow.size(f)
-                    result = m.fSent(h, n, fid)
-
-                    h_in_route = Select(m.fRoute(src, dest), h)
-                    n_is_next_hop = n == m.fNext(h, dest)
-                    condition = And(h_in_route, n_is_next_hop)
-
-                    yield result == If(condition, size, 0)
-
-    # (C2) Host sending and receiving capacities
-    # -------------------------------------------
-    def __encode_c2(self):
         m = self.model
 
         for h in m.hosts:
@@ -153,9 +153,9 @@ class ModelEncoder(object):
             else:  # Continuous sending property
                 yield self.__mk_units_sent(h) == h.sending_cap
 
-    # (C3) Link capacities
+    # (C2) Link capacities
     # -------------------------------------------
-    def __encode_c3(self):
+    def __encode_c2(self):
         m = self.model
         for l in m.links:
             yield self.__mk_units_sent_to(l.h1, l.h2) + self.__mk_units_sent_to(l.h2, l.h1) <= l.capacity
@@ -169,7 +169,6 @@ class ModelEncoder(object):
         return Sum([m.fSent(m.host_map[src], m.host_map[dest], fid) for fid in m.fids])
 
     def __mk_units_sent(self, host):
-        # TODO: does this work for disconnected hosts?
         return Sum([self.__mk_units_sent_to(host, l.neighbor(host)) for l in host.links])
 
     def __mk_units_recvd(self, host):
@@ -194,6 +193,6 @@ class ModelEncoder(object):
     # ---------------------- #
     def get_assertions(self):
         a = self.__collect_assertions(self.__encode_f1, self.__encode_f2, self.__encode_f3,
-                                      self.__encode_g1, self.__encode_g2,
-                                      self.__encode_c1, self.__encode_c2, self.__encode_c3)
+                                      self.__encode_g1, self.__encode_g2, self.__encode_g3,
+                                      self.__encode_c1, self.__encode_c2)
         return a
