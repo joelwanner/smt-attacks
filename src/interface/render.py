@@ -44,7 +44,7 @@ class NetworkRenderer(object):
         for h in self.network.hosts:
             label = "<<B>%s</B><br/>%d  %d<br/>%d>" % (h.name, h.receiving_cap, h.sending_cap, h.amp_factor)
 
-            n = pydot.Node(h.name, label=label, style='filed', margin=-0.8, width=0.5, height=0.5,
+            n = pydot.Node(h.name, label=label, style='filled', margin=-0.8, width=0.5, height=0.5,
                            fontname=self.font_name, fontsize=self.node_fontsize)
 
             if type(h) is Server:
