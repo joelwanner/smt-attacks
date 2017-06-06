@@ -133,36 +133,23 @@ class ModelEncoder(object):
         m = self.model
 
         for h in m.hosts:
-            if not h == m.victim:
-                yield self.__mk_units_recvd(h) <= h.receiving_cap
+            if h not in m.victims:
+                yield m.mk_units_recvd(h) <= h.receiving_cap
             else:  # Attack property
-                yield self.__mk_units_recvd(h) > h.receiving_cap
+                yield True
 
-            if h not in m.attackers:
-                yield self.__mk_units_sent(h) <= h.sending_cap
-            else:  # Continuous sending property
-                yield self.__mk_units_sent(h) == h.sending_cap
+            yield m.mk_units_sent(h) <= h.sending_cap
+            # if h not in m.attackers:
+            #     yield self.__mk_units_sent(h) <= h.sending_cap
+            # else:  # Continuous sending property
+            #     yield self.__mk_units_sent(h) == h.sending_cap
 
     # (C2) Link capacities
     # -------------------------------------------
     def __encode_c2(self):
         m = self.model
         for l in m.links:
-            yield self.__mk_units_sent_to(l.h1, l.h2) + self.__mk_units_sent_to(l.h2, l.h1) <= l.capacity
-
-    # --------------------- #
-    #    Helper Functions   #
-    # --------------------- #
-
-    def __mk_units_sent_to(self, src, dest):
-        m = self.model
-        return Sum([m.fSent(m.host_map[src], m.host_map[dest], f) for f in m.flows])
-
-    def __mk_units_sent(self, host):
-        return Sum([self.__mk_units_sent_to(host, l.neighbor(host)) for l in host.links])
-
-    def __mk_units_recvd(self, host):
-        return Sum([self.__mk_units_sent_to(l.neighbor(host), host) for l in host.links])
+            yield m.mk_units_sent_to(l.h1, l.h2) + m.mk_units_sent_to(l.h2, l.h1) <= l.capacity
 
     @staticmethod
     def __collect_assertions(*functions):
@@ -182,7 +169,17 @@ class ModelEncoder(object):
     #    Public Functions    #
     # ---------------------- #
     def get_assertions(self):
+        m = self.model
+
         a = self.__collect_assertions(self.__encode_f1, self.__encode_f2, self.__encode_f3,
                                       self.__encode_g1, self.__encode_g2,
                                       self.__encode_c1, self.__encode_c2)
+
+        if m.victims:
+            attack_properties = []
+            for h in m.victims:
+                attack_properties.append(m.mk_units_recvd(h) > h.receiving_cap)
+
+            a.append(Or(attack_properties))
+
         return a

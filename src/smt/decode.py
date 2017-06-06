@@ -34,3 +34,21 @@ class ModelDecoder(object):
                 flows.append(Flow(fid, route, size))
 
         return flows
+
+    def victims(self):
+        victims = []
+        for h in self.network.hosts:
+            received = self.model.evaluate(self.network.mk_units_recvd(h)).as_long()
+            if received > h.receiving_cap:
+                victims.append(h)
+
+        return victims
+
+    def attackers(self):
+        attackers = []
+        for h in self.network.hosts:
+            received = self.model.evaluate(self.network.mk_units_recvd(h)).as_long()
+            if received > h.receiving_cap:
+                attackers.append(h)
+
+        return attackers

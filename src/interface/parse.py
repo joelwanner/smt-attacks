@@ -69,20 +69,18 @@ def parse_network(s):
 
 def parse_attack(s, n_flows):
     network = Network.from_string(s)
-    victim = None
+    victims = None
     attackers = None
 
     flow_search = re.search(r"flows\s*:\s*(\d+)", s)
     if flow_search:
         n_flows = int(flow_search.groups()[0])
 
-    victim_search = re.search(r"victim\s*:\s*([^\s]*)", s)
+    victim_search = re.search(r"victims\s*:\s*\[([^\s]*)\]", s)
     if victim_search:
-        name = victim_search.groups()[0]
-        matches = [h for h in network.hosts if h.name == name]
-
-        if matches:
-            victim = matches[0]
+        victims_str = victim_search.groups()[0]
+        names = [x.strip() for x in victims_str.split(',')]
+        victims = [h for h in network.hosts if h.name in names]
 
     attackers_search = re.search(r"attackers\s*:\s*\[([^\s]*)\]", s)
     if attackers_search:
@@ -90,4 +88,6 @@ def parse_attack(s, n_flows):
         names = [x.strip() for x in attackers_str.split(',')]
         attackers = [h for h in network.hosts if h.name in names]
 
-    return smt.check.AttackChecker(network, n_flows, victim, attackers)
+    # TODO: check if attackers and victims are disjoint
+
+    return smt.check.AttackChecker(network, n_flows, victims, attackers)

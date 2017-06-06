@@ -7,7 +7,7 @@ class Model(object):
         self.links = execution.network.links
         self.routes = execution.network.get_routes()
 
-        self.victim = execution.victim
+        self.victims = execution.victims
         self.attackers = execution.attackers
 
         # Hosts
@@ -45,3 +45,16 @@ class Model(object):
         # Set public fields
         # --------------------------
         self.Flow = Flow
+
+    # --------------------- #
+    #    Helper Functions   #
+    # --------------------- #
+
+    def mk_units_sent_to(self, src, dest):
+        return Sum([self.fSent(self.host_map[src], self.host_map[dest], f) for f in self.flows])
+
+    def mk_units_sent(self, host):
+        return Sum([self.mk_units_sent_to(host, l.neighbor(host)) for l in host.links])
+
+    def mk_units_recvd(self, host):
+        return Sum([self.mk_units_sent_to(l.neighbor(host), host) for l in host.links])

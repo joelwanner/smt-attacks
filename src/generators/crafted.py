@@ -27,7 +27,7 @@ class AmplificationNetwork(Network):
 class AmplificationAttack(Execution):
     def __init__(self, n_servers):
         network = AmplificationNetwork(n_servers)
-        super().__init__(network, n_servers * 2, network.victim)
+        super().__init__(network, n_servers * 2, [network.victim])
 
 
 class CoremeltNetwork(Network):
@@ -54,4 +54,4 @@ class CoremeltNetwork(Network):
 class CoremeltAttack(Execution):
     def __init__(self, n):
         network = CoremeltNetwork(n)
-        super().__init__(network, n * 2, network.victim)
+        super().__init__(network, n * 2, [network.victim])

@@ -14,25 +14,26 @@ class NetworkChecker(object):
         self.verbose = verbose
 
     def check_attack(self, out_path):
-        attack_found = self.checker.check()
+        attacks = self.checker.check()
 
-        if attack_found:
-            print("Attack found on %s." % self.checker.attack.victim.__repr__())
+        if attacks:
+            for a in attacks:
+                print("Attack found on %s." % a.victims)
         else:
             print("No attack possible.")
 
         if self.name:
-            if attack_found:
-                attack = self.checker.attack
-            else:
-                attack = None
-
             out_prefix = os.path.join(out_path, self.name) + "-"
-            nr = NetworkRenderer(self.checker.network, attack)
-            nr.render(out_prefix + "network")
-
             log.print_subsep()
-            print("Network rendering is located at:\n" + out_prefix + "network.pdf")
+
+            if attacks:
+                for i, a in enumerate(attacks):
+                    nr = NetworkRenderer(self.checker.network, a)
+                    nr.render("%sattack%d" % (out_prefix, i + 1))
+            else:
+                nr = NetworkRenderer(self.checker.network, None)
+                nr.render(out_prefix + "network")
+                print("Network rendering is located at:\n%s-network.pdf" % out_prefix)
 
         log.print_sep()
 

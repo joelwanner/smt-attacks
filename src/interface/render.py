@@ -35,21 +35,21 @@ class NetworkRenderer(object):
             n.set_fontsize(self.node_fontsize)
 
             if type(h) is Server:
-                if self.execution and h == self.execution.victim:
+                if self.execution and h in self.execution.victims:
                     n.set_shape("doublecircle")
                 else:
                     n.set_shape("Mcircle")
 
                 n.set_fillcolor(self.server_color)
             elif type(h) is Router:
-                if self.execution and h == self.execution.victim:
+                if self.execution and h in self.execution.victims:
                     n.set_shape("doubleoctagon")
                 else:
                     n.set_shape("octagon")
 
                 n.set_fillcolor(self.server_color)
             else:
-                if self.execution and h == self.execution.victim:
+                if self.execution and h in self.execution.victims:
                     n.set_shape("doublecircle")
                 else:
                     n.set_shape("circle")
