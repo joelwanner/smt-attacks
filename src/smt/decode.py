@@ -42,6 +42,11 @@ class ModelDecoder(object):
             if self.model.evaluate(And(r > h.receiving_cap)):  # Hack to prevent AttributeError from Z3
                 victims.append(h)
 
+        for l in self.network.links:
+            s = self.network.mk_units_over_link(l)
+            if self.model.evaluate(And(s > l.capacity)):  # Hack to prevent AttributeError from Z3
+                victims.append(l)
+
         return victims
 
     def attackers(self):

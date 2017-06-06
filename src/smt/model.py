@@ -53,8 +53,11 @@ class Model(object):
     def mk_units_sent_to(self, src, dest):
         return Sum([self.fSent(self.host_map[src], self.host_map[dest], f) for f in self.flows])
 
-    def mk_units_sent(self, host):
-        return Sum([self.mk_units_sent_to(host, l.neighbor(host)) for l in host.links])
+    def mk_units_sent(self, h):
+        return Sum([self.mk_units_sent_to(h, l.neighbor(h)) for l in h.links])
 
-    def mk_units_recvd(self, host):
-        return Sum([self.mk_units_sent_to(l.neighbor(host), host) for l in host.links])
+    def mk_units_recvd(self, h):
+        return Sum([self.mk_units_sent_to(l.neighbor(h), h) for l in h.links])
+
+    def mk_units_over_link(self, l):
+        return self.mk_units_sent_to(l.h1, l.h2) + self.mk_units_sent_to(l.h2, l.h1)

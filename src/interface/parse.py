@@ -79,8 +79,9 @@ def parse_attack(s, n_flows):
     victim_search = re.search(r"victims\s*:\s*\[([^\s]*)\]", s)
     if victim_search:
         victims_str = victim_search.groups()[0]
-        names = [x.strip() for x in victims_str.split(',')]
-        victims = [h for h in network.hosts if h.name in names]
+        names = [x.strip() for x in victims_str.split(',')]  # may be hosts or links
+        victims = [h for h in network.hosts if h.name in names] +\
+                  [l for l in network.links if l.__repr__() in names]
 
     attackers_search = re.search(r"attackers\s*:\s*\[([^\s]*)\]", s)
     if attackers_search:

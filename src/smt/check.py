@@ -6,13 +6,14 @@ from smt.solve import *
 
 
 class AttackChecker:
-    def __init__(self, network, n_flows, victims=None, attackers=None):
+    def __init__(self, network, n_flows, victims=None, links=None, attackers=None):
         if n_flows <= 0:
             raise ValueError("Invalid number of flows specified")
 
         self.network = network
         self.n_flows = n_flows
         self.victims = victims
+        self.target_links = links
         self.attackers = attackers
 
         self.attacks = []
@@ -35,12 +36,13 @@ class AttackChecker:
         else:
             return None
 
-    def check(self):
+    def check_host_attacks(self):
         if not self.attackers:
             potential_attackers = [h for h in self.network.hosts if not (isinstance(h, Server) or h == self.victims)]
         else:
             potential_attackers = self.attackers
 
+        # Single victim is specified
         if self.victims and len(self.victims) == 1:
             # Check attack on single victim
             attack = self.__check_execution(Execution(self.network, self.n_flows, self.victims, potential_attackers))
@@ -50,6 +52,7 @@ class AttackChecker:
             else:
                 return []
 
+        # Multiple or no victims are specified
         else:
             if self.victims:
                 potential_victims = self.victims
@@ -79,6 +82,14 @@ class AttackChecker:
                         self.attacks.append(attack)
 
             return self.attacks
+
+    def check_link_attack(self):
+        if not self.attackers:
+            potential_attackers = [h for h in self.network.hosts if not (isinstance(h, Server) or h == self.victims)]
+        else:
+            potential_attackers = self.attackers
+
+        return self.__check_execution(Execution(self.network, self.n_flows, self.target_links, potential_attackers))
 
     @classmethod
     def from_string(cls, s, n_flows):

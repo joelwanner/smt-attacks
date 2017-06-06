@@ -149,7 +149,8 @@ class ModelEncoder(object):
     def __encode_c2(self):
         m = self.model
         for l in m.links:
-            yield m.mk_units_sent_to(l.h1, l.h2) + m.mk_units_sent_to(l.h2, l.h1) <= l.capacity
+            if l not in m.victims:
+                yield m.mk_units_over_link(l) <= l.capacity
 
     @staticmethod
     def __collect_assertions(*functions):
@@ -177,8 +178,11 @@ class ModelEncoder(object):
 
         if m.victims:
             attack_properties = []
-            for h in m.victims:
-                attack_properties.append(m.mk_units_recvd(h) > h.receiving_cap)
+            for v in m.victims:
+                if isinstance(v, Host):
+                    attack_properties.append(m.mk_units_recvd(v) > v.receiving_cap)
+                elif isinstance(v, Link):
+                    attack_properties.append(m.mk_units_over_link(v) > v.capacity)
 
             a.append(Or(attack_properties))
 

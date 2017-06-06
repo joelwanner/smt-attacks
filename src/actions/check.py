@@ -14,7 +14,7 @@ class NetworkChecker(object):
         self.verbose = verbose
 
     def check_attack(self, out_path):
-        attacks = self.checker.check()
+        attacks = self.checker.check_host_attacks()
 
         if attacks:
             for a in attacks:
@@ -28,8 +28,10 @@ class NetworkChecker(object):
 
             if attacks:
                 for i, a in enumerate(attacks):
+                    path = "%sattack%d" % (out_prefix, i + 1)
                     nr = NetworkRenderer(self.checker.network, a)
-                    nr.render("%sattack%d" % (out_prefix, i + 1))
+                    nr.render(path)
+                    print("Attack rendering is located at:\n%s.pdf" % path)
             else:
                 nr = NetworkRenderer(self.checker.network, None)
                 nr.render(out_prefix + "network")

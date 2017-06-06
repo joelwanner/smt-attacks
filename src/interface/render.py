@@ -8,7 +8,8 @@ class NetworkRenderer(object):
     host_color = "#f0f0f0"
     attacker_color = "#ffe6e6"
     server_color = "#bfbfbf"
-    light_color = "#aaaaaa"
+    link_color = "#666666"
+    light_color = "#bbbbbb"
     font_name = "Helvetica"
     label_size = 10
     node_fontsize = 8
@@ -79,7 +80,7 @@ class NetworkRenderer(object):
             v1 = node_map[l.h1]
             v2 = node_map[l.h2]
 
-            e = pydot.Edge(v1, v2, dir='none', label=str(l.capacity),
+            e = pydot.Edge(v1, v2, dir='none', label=str(l.capacity), color=self.link_color, fontcolor=self.link_color,
                            fontname=self.font_name, fontsize=self.label_size)
             g.add_edge(e)
 
@@ -89,7 +90,7 @@ class NetworkRenderer(object):
                 residual = l.capacity - f1 - f2
                 e.set_label("%d/%d" % (residual, l.capacity))
 
-                if residual == 0:
+                if residual <= 0:
                     e.set_color(self.light_color)
                     e.set_fontcolor(self.light_color)
 
