@@ -140,9 +140,9 @@ class ModelEncoder(object):
 
             yield m.mk_units_sent(h) <= h.sending_cap
             # if h not in m.attackers:
-            #     yield self.__mk_units_sent(h) <= h.sending_cap
+            #     yield self.mk_units_sent(h) <= h.sending_cap
             # else:  # Continuous sending property
-            #     yield self.__mk_units_sent(h) == h.sending_cap
+            #     yield self.mk_units_sent(h) == h.sending_cap
 
     # (C2) Link capacities
     # -------------------------------------------

@@ -38,8 +38,8 @@ class ModelDecoder(object):
     def victims(self):
         victims = []
         for h in self.network.hosts:
-            received = self.model.evaluate(self.network.mk_units_recvd(h)).as_long()
-            if received > h.receiving_cap:
+            r = self.network.mk_units_recvd(h)
+            if self.model.evaluate(And(r > h.receiving_cap)):  # Hack to prevent AttributeError from Z3
                 victims.append(h)
 
         return victims
@@ -47,8 +47,8 @@ class ModelDecoder(object):
     def attackers(self):
         attackers = []
         for h in self.network.hosts:
-            received = self.model.evaluate(self.network.mk_units_recvd(h)).as_long()
-            if received > h.receiving_cap:
+            s = self.network.mk_units_sent(h)
+            if self.model.evaluate(And(s > h.sending_cap)):
                 attackers.append(h)
 
         return attackers

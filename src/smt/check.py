@@ -64,7 +64,10 @@ class AttackChecker:
             attack = self.__check_execution(Execution(self.network, self.n_flows, potential_attackers, self.attackers))
 
             if attack:
-                # At least for one victim, there is an attack possible -- check them individually
+                if len(attack.victims) == 1:
+                    return [attack]
+
+                # Fore more than one victim, there may be an attack possible -- check them individually
                 for v in attack.victims:
                     print("Checking attack on victim %s" % v.__repr__())
 
