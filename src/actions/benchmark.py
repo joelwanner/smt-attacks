@@ -40,8 +40,10 @@ def benchmark_files(directory, out_path):
 
 
 def __benchmark_example(cls, sizes, n_flows, logfile):
+    x = []
     runtimes = []
-    for i, n in enumerate(sizes):
+
+    for i, n in enumerate(sizes):  # TODO: use zip() here
         attack = cls(n)
         checker = AttackChecker.from_execution(attack, n_flows[i])
         nc = NetworkChecker(checker)
@@ -50,9 +52,13 @@ def __benchmark_example(cls, sizes, n_flows, logfile):
         nc.check_attack(out_path=None)
         runtime = time.time() - start_time
 
-        print("Runtime for %d hosts: %.3fs" % (len(attack.network.hosts), runtime))
+        n_hosts = len(attack.network.hosts)
+        print("Runtime for %d hosts: %.3fs" % (n_hosts, runtime))
 
-    x_str = ", ".join(["%.3f" % n for n in sizes])
+        x.append(n_hosts)
+        runtimes.append(runtime)
+
+    x_str = ", ".join(["%d" % n for n in x])
     y_str = ", ".join(["%.3f" % t for t in runtimes])
     logfile.write("x = [%s]\ny = [%s]\n" % (x_str, y_str))
 
