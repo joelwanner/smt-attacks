@@ -89,7 +89,12 @@ class AttackChecker:
         else:
             potential_attackers = self.attackers
 
-        return self.__check_execution(Execution(self.network, self.n_flows, self.target_links, potential_attackers))
+        attack = self.__check_execution(Execution(self.network, self.n_flows, self.target_links, potential_attackers))
+
+        if attack:
+            return [attack]
+        else:
+            return []
 
     @classmethod
     def from_string(cls, s, n_flows):

@@ -14,7 +14,10 @@ class NetworkChecker(object):
         self.verbose = verbose
 
     def check_attack(self, out_path):
-        attacks = self.checker.check_host_attacks()
+        if self.checker.target_links:
+            attacks = self.checker.check_link_attack()
+        else:
+            attacks = self.checker.check_host_attacks()
 
         if attacks:
             for a in attacks:

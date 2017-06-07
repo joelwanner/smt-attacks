@@ -60,9 +60,9 @@ def __benchmark_example(cls, sizes, n_flows, logfile):
 def benchmark_examples(out_path, sizes):
     with create_logfile(out_path) as logfile:
         log.print_header("Server Amplification Attacks")
-
         logfile.write("Server Amplification Attack\n")
         __benchmark_example(AmplificationAttack, sizes, [2 * n for n in sizes], logfile)
 
-        logfile.write("Coremelt Attack\n")
+        log.print_header("Coremelt Attacks")
+        logfile.write("\nCoremelt Attack\n")
         __benchmark_example(CoremeltAttack, sizes, [2 * n for n in sizes], logfile)
