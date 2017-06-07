@@ -39,25 +39,30 @@ def benchmark_files(directory, out_path):
                 logfile.write("%s: %.3f\n" % (filename, runtime))
 
 
+def __benchmark_example(cls, sizes, n_flows, logfile):
+    runtimes = []
+    for i, n in enumerate(sizes):
+        attack = cls(n)
+        checker = AttackChecker.from_execution(attack, n_flows[i])
+        nc = NetworkChecker(checker)
+
+        start_time = time.time()
+        nc.check_attack(out_path=None)
+        runtime = time.time() - start_time
+
+        print("Runtime for %d hosts: %.3fs" % (len(attack.network.hosts), runtime))
+
+    x_str = ", ".join(["%.3f" % n for n in sizes])
+    y_str = ", ".join(["%.3f" % t for t in runtimes])
+    logfile.write("x = [%s]\ny = [%s]\n" % (x_str, y_str))
+
+
 def benchmark_examples(out_path, sizes):
     with create_logfile(out_path) as logfile:
         log.print_header("Server Amplification Attacks")
+
         logfile.write("Server Amplification Attack\n")
+        __benchmark_example(AmplificationAttack, sizes, [2 * n for n in sizes], logfile)
 
-        runtimes = []
-        for n in sizes:
-            attack = AmplificationAttack(n)
-            checker = AttackChecker.from_execution(attack, n * 2)
-            nc = NetworkChecker(checker)
-
-            start_time = time.time()
-            nc.check_attack(out_path)
-            runtime = time.time() - start_time
-
-            n_hosts = n + 2
-            print("n = %d: %.3fs" % (n_hosts, runtime))
-            runtimes.append(runtime)
-
-        x_str = ", ".join(["%.3f" % n for n in sizes])
-        y_str = ", ".join(["%.3f" % t for t in runtimes])
-        logfile.write("x = [%s]\ny = [%s]\n" % (x_str, y_str))
+        logfile.write("Coremelt Attack\n")
+        __benchmark_example(CoremeltAttack, sizes, [2 * n for n in sizes], logfile)
