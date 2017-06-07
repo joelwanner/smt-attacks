@@ -10,9 +10,16 @@ class ModelEncoder(object):
     #      Constraints      #
     # --------------------- #
 
-    # (F1) Routing table setup
+    # (F1) Inverse fId projection function
     # -------------------------------------------
     def __encode_f1(self):
+        m = self.model
+        for i, f in enumerate(m.flows):
+            yield m.fpIdInv(m.fids[i]) == f
+
+    # (F2) Routing table setup
+    # -------------------------------------------
+    def __encode_f2(self):
         m = self.model
         table = m.routes
 
@@ -45,13 +52,14 @@ class ModelEncoder(object):
 
                 yield And(rule_next, rule_route)
 
-    # (F2) Flow request field constraints
+    # (F3) Request function constraints
     # -------------------------------------------
-    def __encode_f2(self):
+    def __encode_f3(self):
         m = self.model
 
         for f in m.flows:
-            r = m.fReq(f)
+            rid = m.fReq(f)
+            r = m.fpIdInv(rid)
 
             f_is_response = m.Flow.type(f) == m.RESPONSE
             r_is_request = m.Flow.type(r) == m.REQUEST
@@ -59,13 +67,13 @@ class ModelEncoder(object):
             distinct = Not(f == r)
 
             # Ensure that there is no other response that is mapped to the same request
-            is_lone_response = And([Not(m.fReq(g) == r) for g in m.flows if not g == f])
+            is_lone_response = And([Not(m.fReq(g) == rid) for g in m.flows if not g == f])
 
             yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
 
-    # (F3) Definition of sent function
+    # (F4) Definition of sent function
     # -------------------------------------------
-    def __encode_f3(self):
+    def __encode_f4(self):
         m = self.model
 
         for host in m.hosts:
@@ -119,7 +127,7 @@ class ModelEncoder(object):
 
             if len(m.flows) > 1:
                 for f in m.flows:
-                    r = m.fReq(f)
+                    r = m.fpIdInv(m.fReq(f))
 
                     is_response = m.Flow.type(f) == m.RESPONSE
                     belongs_to_host = m.Flow.src(f) == h
@@ -172,7 +180,7 @@ class ModelEncoder(object):
     def get_assertions(self):
         m = self.model
 
-        a = self.__collect_assertions(self.__encode_f1, self.__encode_f2, self.__encode_f3,
+        a = self.__collect_assertions(self.__encode_f1, self.__encode_f2, self.__encode_f3, self.__encode_f4,
                                       self.__encode_g1, self.__encode_g2,
                                       self.__encode_c1, self.__encode_c2)
 
