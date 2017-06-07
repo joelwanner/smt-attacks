@@ -3,9 +3,9 @@ import os
 
 from actions.check import NetworkChecker
 from actions.generate import Generator
-from actions.benchmark import run_benchmarks
-from smt.check import AttackChecker
+from actions.benchmark import benchmark_files, benchmark_examples
 from generators.random import RandomNetwork
+from smt.check import AttackChecker
 
 
 EXAMPLES_PATH = "examples/"
@@ -43,6 +43,7 @@ if __name__ == '__main__':
             os.makedirs(EXAMPLES_PATH)
 
         g = Generator(EXAMPLES_PATH)
+        # TODO: allow input to specify these parameters
         g.generate_random(10, 6)
         g.generate_crafted(range(3, 10))
 
@@ -52,10 +53,12 @@ if __name__ == '__main__':
         checker.check_attack(OUTPUT_PATH)
 
     if args.benchmark:
-        run_benchmarks(EXAMPLES_PATH, OUTPUT_PATH)
+        # TODO: add parameters to choose what happens
+        # benchmark_files(EXAMPLES_PATH, OUTPUT_PATH)
+        benchmark_examples(OUTPUT_PATH, range(3, 6))
 
     if args.random:
         network = RandomNetwork(int(args.random))
-        attack = AttackChecker(network, n_flows)
-        checker = NetworkChecker(attack, "random", verbose=args.debug)
-        checker.check_attack(OUTPUT_PATH)
+        checker = AttackChecker(network, 10)
+        nc = NetworkChecker(checker, "random", verbose=args.debug)
+        nc.check_attack(OUTPUT_PATH)

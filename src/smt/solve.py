@@ -28,9 +28,11 @@ class SmtSolver(object):
         for a in assertions:
             s.add(a)
 
-        log.print_subheader("Solving formula...")
+        log.print_subsep()
+        print("Solving formula...")
 
         if self.verbose:
+            log.print_subsep()
             print(s)
 
         start_time = time.time()
@@ -42,16 +44,19 @@ class SmtSolver(object):
             print(s.statistics())
 
         if result == sat:
-            log.print_subheader("Satisfiable.")
+            print("Satisfiable.")
+            log.print_subsep()
             self.model = s.model()
 
             if self.verbose:
                 print(self.model)
                 log.print_sep()
         elif result == unsat:
-            log.print_subheader("Unatisfiable.")
+            print("Unatisfiable.")
+            log.print_subsep()
         else:
-            log.print_subheader("Unknown.")
+            print("Unknown.")
+            log.print_subsep()
 
         log.print_subsep()
         print("Runtime: %.3fs" % runtime)

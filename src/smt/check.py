@@ -94,3 +94,9 @@ class AttackChecker:
     @classmethod
     def from_string(cls, s, n_flows):
         return parser.parse_attack(s, n_flows)
+
+    @classmethod
+    def from_execution(cls, e, n_flows):
+        victim_hosts = [h for h in e.victims if isinstance(h, Host)]
+        victim_links = [h for h in e.victims if isinstance(h, Link)]
+        return cls(e.network, n_flows, victim_hosts, victim_links, e.attackers)
