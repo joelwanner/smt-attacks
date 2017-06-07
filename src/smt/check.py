@@ -55,31 +55,37 @@ class AttackChecker:
         # Multiple or no victims are specified
         else:
             if self.victims:
-                potential_victims = self.victims
+                potential_victims = list(self.victims)
             else:
                 if self.attackers:
-                    potential_victims = [h for h in self.network.hosts if h not in self.attackers]
+                    potential_victims = list([h for h in self.network.hosts if h not in self.attackers])
                 else:
-                    potential_victims = self.network.hosts
+                    potential_victims = list(self.network.hosts)
 
-            # Perform first check to see which hosts can be attacked
-            print("Looking for attacks on %s" % potential_victims)
-            attack = self.__check_execution(Execution(self.network, self.n_flows, potential_attackers, self.attackers))
+            while potential_victims:
+                # Perform first check to see which hosts can be attacked
+                print("Looking for attacks on %s" % potential_victims)
+                e = Execution(self.network, self.n_flows, potential_victims, self.attackers)
+                attack = self.__check_execution(e)
 
-            if attack:
-                print("Potential victims: %s" % attack.victims)
-                if len(attack.victims) == 1:
-                    return [attack]
-
-                # Fore more than one victim, there may be an attack possible -- check them individually
-                for v in attack.victims:
-                    print("Checking attack on victim %s" % v.__repr__())
-
-                    attackers = [h for h in potential_attackers if h != v]
-                    attack = self.__check_execution(Execution(self.network, self.n_flows, [v], attackers))
-
-                    if attack:
+                if attack:
+                    print("Potential victims: %s" % attack.victims)
+                    if len(attack.victims) == 1:
                         self.attacks.append(attack)
+                        potential_victims.remove(attack.victims[0])
+                    else:
+                        # For more than one victim, there may be an attack possible -- check them individually
+                        for v in attack.victims:
+                            potential_victims.remove(v)
+                            print("Checking attack on victim %s" % v.__repr__())
+
+                            attackers = [h for h in potential_attackers if h != v]
+                            attack = self.__check_execution(Execution(self.network, self.n_flows, [v], attackers))
+
+                            if attack:
+                                self.attacks.append(attack)
+                else:
+                    break
 
             return self.attacks
 

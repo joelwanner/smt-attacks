@@ -55,7 +55,7 @@ if __name__ == '__main__':
     if args.benchmark:
         # TODO: add parameters to choose what happens
         # benchmark_files(EXAMPLES_PATH, OUTPUT_PATH)
-        benchmark_examples(OUTPUT_PATH, range(3, 11))
+        benchmark_examples(OUTPUT_PATH, range(3, 7))
 
     if args.random:
         network = RandomNetwork(int(args.random))
