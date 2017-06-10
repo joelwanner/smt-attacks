@@ -4,7 +4,7 @@ import os
 from actions.check import NetworkChecker
 from actions.generate import Generator
 from actions.benchmark import benchmark_files, benchmark_examples
-from generators.random import RandomNetwork
+from generators.random import RandomTopology
 from smt.check import AttackChecker
 
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         benchmark_examples(OUTPUT_PATH, range(3, 7))
 
     if args.random:
-        network = RandomNetwork(int(args.random))
+        network = RandomTopology(int(args.random))
         checker = AttackChecker(network, 10)
         nc = NetworkChecker(checker, "random", verbose=args.debug)
         nc.check_attack(OUTPUT_PATH)

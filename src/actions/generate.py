@@ -18,12 +18,12 @@ class Generator(object):
 
     def generate_random(self, n_networks, n_hosts):
         for n in range(n_networks):
-            network = RandomNetwork(n_hosts)
+            network = RandomTopology(n_hosts)
             path = os.path.join(self.path, "random%d.txt" % n)
 
             with open(path, "w") as file:
                 file.write(network.__str__())
 
     def generate_crafted(self, sizes):
-        self.__generate(AmplificationAttack, "amplification", sizes)
-        self.__generate(CoremeltAttack, "coremelt", sizes)
+        self.__generate(AmplificationNetwork, "amplification", sizes)
+        self.__generate(CoremeltNetwork, "coremelt", sizes)

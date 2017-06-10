@@ -3,7 +3,7 @@ import time
 
 import interface.log as log
 from actions.check import NetworkChecker
-from generators.crafted import AmplificationAttack, CoremeltAttack
+from generators.crafted import AmplificationNetwork, CoremeltNetwork
 from smt.check import AttackChecker
 
 
@@ -67,8 +67,8 @@ def benchmark_examples(out_path, sizes):
     with create_logfile(out_path) as logfile:
         log.print_header("Server Amplification Attacks")
         logfile.write("Server Amplification Attack\n")
-        __benchmark_example(AmplificationAttack, sizes, [2 * n for n in sizes], logfile)
+        __benchmark_example(AmplificationNetwork, sizes, [2 * n for n in sizes], logfile)
 
         log.print_header("Coremelt Attacks")
         logfile.write("\nCoremelt Attack\n")
-        __benchmark_example(CoremeltAttack, sizes, [2 * n for n in sizes], logfile)
+        __benchmark_example(CoremeltNetwork, sizes, [2 * n for n in sizes], logfile)

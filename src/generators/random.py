@@ -2,10 +2,10 @@ import networkx as nx
 import random
 import string
 
-from network.network import *
+from network.topology import *
 
 
-class RandomNetwork(Network):
+class RandomTopology(Topology):
     # TODO: add random seed
     def __init__(self, n):
         hosts = []

@@ -1,5 +1,5 @@
-from network.execution import Execution
-from network.network import *
+from network.network import Network
+from network.topology import *
 from smt.encode import ModelEncoder
 from smt.decode import ModelDecoder
 from smt.solve import *
@@ -45,7 +45,7 @@ class AttackChecker:
         # Single victim is specified
         if self.victims and len(self.victims) == 1:
             # Check attack on single victim
-            attack = self.__check_execution(Execution(self.network, self.n_flows, self.victims, potential_attackers))
+            attack = self.__check_execution(Network(self.network, self.n_flows, self.victims, potential_attackers))
             if attack:
                 self.attacks.append(attack)
                 return [attack]
@@ -65,7 +65,7 @@ class AttackChecker:
             while potential_victims:
                 # Perform first check to see which hosts can be attacked
                 print("Looking for attacks on %s" % potential_victims)
-                e = Execution(self.network, self.n_flows, potential_victims, self.attackers)
+                e = Network(self.network, self.n_flows, potential_victims, self.attackers)
                 attack = self.__check_execution(e)
 
                 if attack:
@@ -80,7 +80,7 @@ class AttackChecker:
                             print("Checking attack on victim %s" % v.__repr__())
 
                             attackers = [h for h in potential_attackers if h != v]
-                            attack = self.__check_execution(Execution(self.network, self.n_flows, [v], attackers))
+                            attack = self.__check_execution(Network(self.network, self.n_flows, [v], attackers))
 
                             if attack:
                                 self.attacks.append(attack)
@@ -95,7 +95,7 @@ class AttackChecker:
         else:
             potential_attackers = self.attackers
 
-        attack = self.__check_execution(Execution(self.network, self.n_flows, self.target_links, potential_attackers))
+        attack = self.__check_execution(Network(self.network, self.n_flows, self.target_links, potential_attackers))
 
         if attack:
             return [attack]

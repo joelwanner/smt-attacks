@@ -1,8 +1,8 @@
-from network.network import *
-from network.execution import Execution
+from network.topology import *
+from network.network import Network
 
 
-class AmplificationNetwork(Network):
+class AmplificationTopology(Topology):
     def __init__(self, n_servers):
         amp_factor = 3
         hosts = []
@@ -24,13 +24,13 @@ class AmplificationNetwork(Network):
         super().__init__(hosts, links)
 
 
-class AmplificationAttack(Execution):
+class AmplificationNetwork(Network):
     def __init__(self, n_servers):
-        network = AmplificationNetwork(n_servers)
+        network = AmplificationTopology(n_servers)
         super().__init__(network, n_servers * 2, [network.victim])
 
 
-class CoremeltNetwork(Network):
+class CoremeltTopology(Topology):
     def __init__(self, n):
         hosts = []
         links = []
@@ -55,7 +55,7 @@ class CoremeltNetwork(Network):
         super().__init__(hosts, links)
 
 
-class CoremeltAttack(Execution):
+class CoremeltNetwork(Network):
     def __init__(self, n):
-        network = CoremeltNetwork(n)
+        network = CoremeltTopology(n)
         super().__init__(network, n * 2, [network.victim])

@@ -1,6 +1,6 @@
 import pydot
 
-from network.network import *
+from network.topology import *
 
 
 class NetworkRenderer(object):

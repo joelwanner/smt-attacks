@@ -1,6 +1,6 @@
 import re
 
-from network.network import *
+from network.topology import *
 import smt.check
 
 
@@ -64,11 +64,11 @@ def parse_network(s):
 
             links.append(Link(h1, h2, c))
 
-    return Network(hosts, links)
+    return Topology(hosts, links)
 
 
 def parse_attack(s, n_flows):
-    network = Network.from_string(s)
+    network = Topology.from_string(s)
     victims = None
     attackers = None
 

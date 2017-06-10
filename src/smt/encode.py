@@ -1,5 +1,5 @@
 from smt.model import *
-from network.network import *
+from network.topology import *
 
 
 class ModelEncoder(object):
