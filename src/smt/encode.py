@@ -143,14 +143,10 @@ class ModelEncoder(object):
         for h in m.hosts:
             if h not in m.victims:
                 yield m.mk_units_recvd(h) <= h.receiving_cap
-            else:  # Attack property
-                yield True
-
-            yield m.mk_units_sent(h) <= h.sending_cap
-            # if h not in m.attackers:
-            #     yield self.mk_units_sent(h) <= h.sending_cap
-            # else:  # Continuous sending property
-            #     yield self.mk_units_sent(h) == h.sending_cap
+                yield m.mk_units_sent(h) <= h.sending_cap
+            else:
+                yield m.mk_units_recvd(h) > h.receiving_cap  # Attack property
+                yield m.mk_units_sent(h) == 0  # Passive victims
 
     # (C2) Link capacities
     # -------------------------------------------
