@@ -7,7 +7,7 @@ This is the code repository for the thesis *An SMT-Based Approach to Synthesizin
 
 ### Dependencies
 
-SMTAX requires Python 3.0.
+SMTDoS requires Python 3.
 
 The application relies on the [Z3](http://z3prover.github.io) theorem prover.
 In order to install Z3, follow the [instructions](https://github.com/Z3Prover/z3#python) in the Github repository for the python bindings.
