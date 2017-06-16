@@ -55,12 +55,12 @@ class AttackChecker:
         # Multiple or no victims are specified
         else:
             if self.victims:
-                potential_victims = list(self.victims)
+                potential_victims = set(self.victims)
             else:
                 if self.attackers:
-                    potential_victims = list([h for h in self.network.hosts if h not in self.attackers])
+                    potential_victims = set([h for h in self.network.hosts if h not in self.attackers])
                 else:
-                    potential_victims = list(self.network.hosts)
+                    potential_victims = set(self.network.hosts)
 
             while potential_victims:
                 # Perform first check to see which hosts can be attacked
@@ -70,9 +70,11 @@ class AttackChecker:
 
                 if attack:
                     print("Potential victims: %s" % attack.victims)
-                    if len(attack.victims) == 1:
+                    amplifying_victims = [v for v in attack.victims if isinstance(v, Server) or v.amp_factor > 1]
+
+                    if len(attack.victims) == 1 or not amplifying_victims:
                         self.attacks.append(attack)
-                        potential_victims.remove(attack.victims[0])
+                        potential_victims -= set(attack.victims)
                     else:
                         # For more than one victim, there may be an attack possible -- check them individually
                         for v in attack.victims:

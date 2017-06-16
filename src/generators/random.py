@@ -16,7 +16,7 @@ class RandomTopology(Topology):
 
         for node in g.nodes():
             name = string.ascii_uppercase[node]
-            r = random.randint(2, 6)
+            r = random.randint(4, 7)
             s = random.randint(1, 4)
 
             kind = random.randint(0, 5)

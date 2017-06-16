@@ -43,9 +43,13 @@ class NetworkChecker(object):
         log.print_sep()
 
     @classmethod
-    def from_file(cls, path, n_flows, verbose=False):
+    def from_file(cls, path, n_flows, render=True, verbose=False):
         file = open(path, "r")
-        filename = os.path.splitext(os.path.basename(path))[0]
+
+        if render:
+            filename = os.path.splitext(os.path.basename(path))[0]
+        else:
+            filename = None
 
         log.print_header("Running example '%s'" % filename, path)
 

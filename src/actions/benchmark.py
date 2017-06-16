@@ -36,7 +36,7 @@ def benchmark_files(directory, out_path):
                 print()
                 log.print_header("BENCHMARK %d/%d" % (i + 1, n), filename)
 
-                checker = NetworkChecker.from_file(os.path.join(directory, filename), 10, verbose=False)
+                checker = NetworkChecker.from_file(os.path.join(directory, filename), 10, render=False, verbose=False)
 
                 start_time = time.time()
                 checker.check_attack(out_path)

@@ -74,7 +74,7 @@ if __name__ == '__main__':
             lower = input("Smallest size: ")
             upper = input("Largest size: ")
             try:
-                g.generate_crafted(range(int(lower), int(upper)))
+                g.generate_crafted(range(int(lower), int(upper) + 1))
             except ValueError:
                 print("Invalid arguments")
 
@@ -91,7 +91,7 @@ if __name__ == '__main__':
             lower = input("Smallest size: ")
             upper = input("Largest size: ")
             try:
-                benchmark_examples(output, range(int(lower), int(upper)))
+                benchmark_examples(output, range(int(lower), int(upper) + 1))
             except ValueError:
                 print("Invalid arguments")
 
