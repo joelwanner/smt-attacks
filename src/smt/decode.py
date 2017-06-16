@@ -23,7 +23,8 @@ class ModelDecoder(object):
 
         for f in m.flows:
             fid = v.evaluate(m.Flow.id(f))
-            size = v.evaluate(m.Flow.size(f)).as_long()
+            r = v.evaluate(m.Flow.size(f))
+            size = float(r.numerator_as_long())/float(r.denominator_as_long())
 
             if size > 0:
                 id_str = str(v.evaluate(fid))

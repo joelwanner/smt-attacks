@@ -23,7 +23,7 @@ class Model(object):
         FlowType, (self.REQUEST, self.RESPONSE) = EnumSort('FlowType', ['REQUEST', 'RESPONSE'])
 
         Flow = Datatype('Flow')
-        args = [('id', FlowId), ('src', Host), ('dest', Host), ('size', IntSort()), ('type', FlowType)]
+        args = [('id', FlowId), ('src', Host), ('dest', Host), ('size', RealSort()), ('type', FlowType)]
         Flow.declare('mk_flow', *args)
         Flow = Flow.create()
 
@@ -32,7 +32,7 @@ class Model(object):
             fid = self.fids[i]
             src = Const('f%d_src' % i, Host)
             dest = Const('f%d_dest' % i, Host)
-            size = Const('f%d_size' % i, IntSort())
+            size = Const('f%d_size' % i, RealSort())
             ftype = Const('f%d_type' % i, FlowType)
             self.flows.append(Flow.mk_flow(fid, src, dest, size, ftype))
 
@@ -45,7 +45,7 @@ class Model(object):
         self.fRoute = Function('route', Host, Host, Route)
         self.fNext = Function('next', Host, Host, Host)
 
-        self.fSent = Function('sent', Host, Host, Flow, IntSort())
+        self.fSent = Function('sent', Host, Host, Flow, RealSort())
 
         # Set public fields
         # --------------------------
