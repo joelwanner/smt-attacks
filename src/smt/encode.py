@@ -145,8 +145,10 @@ class ModelEncoder(object):
                 yield m.mk_units_recvd(h) <= h.receiving_cap
                 yield m.mk_units_sent(h) <= h.sending_cap
             else:
-                yield m.mk_units_recvd(h) > h.receiving_cap  # Attack property
-                yield m.mk_units_sent(h) == 0  # Passive victims
+                if len(m.victims) == 1:
+                    yield m.mk_units_sent(h) == 0  # Passive victims
+                else:
+                    yield True
 
     # (C2) Link capacities
     # -------------------------------------------
