@@ -23,6 +23,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-n', help="number of flows in the model")
+    parser.add_argument('-o', help="output path")
 
     args = parser.parse_args()
 
@@ -34,9 +35,14 @@ if __name__ == '__main__':
     else:
         n_flows = DEFAULT_N_FLOWS
 
+    if args.o:
+        output = args.o
+    else:
+        output = OUTPUT_PATH
+
     if args.file:
         checker = NetworkChecker.from_file(args.file, n_flows, verbose=args.debug)
-        checker.check_attack(OUTPUT_PATH)
+        checker.check_attack(output)
 
     if args.generate:
         if not os.path.exists(EXAMPLES_PATH):
@@ -75,17 +81,17 @@ if __name__ == '__main__':
     if args.example:
         path = os.path.join(EXAMPLES_PATH, args.example + ".txt")
         checker = NetworkChecker.from_file(path, n_flows, verbose=args.debug)
-        checker.check_attack(OUTPUT_PATH)
+        checker.check_attack(output)
 
     if args.benchmark:
-        if args.generate == 'examples':
-            benchmark_files(EXAMPLES_PATH, OUTPUT_PATH)
+        if args.benchmark == 'examples':
+            benchmark_files(EXAMPLES_PATH, output)
 
-        elif args.generate == 'crafted':
+        elif args.benchmark == 'crafted':
             lower = input("Smallest size: ")
             upper = input("Largest size: ")
             try:
-                benchmark_examples(OUTPUT_PATH, range(int(lower), int(upper)))
+                benchmark_examples(output, range(int(lower), int(upper)))
             except ValueError:
                 print("Invalid arguments")
 
@@ -93,4 +99,4 @@ if __name__ == '__main__':
         network = RandomTopology(int(args.random))
         checker = AttackChecker(network, 10)
         nc = NetworkChecker(checker, "random", verbose=args.debug)
-        nc.check_attack(OUTPUT_PATH)
+        nc.check_attack(output)

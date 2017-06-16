@@ -7,19 +7,25 @@ from generators.crafted import AmplificationNetwork, CoremeltNetwork
 from smt.check import AttackChecker
 
 
-def create_logfile(directory):
-    i = 1
-    path = None
-    while not path or os.path.exists(path):
-        path = os.path.join(directory, "benchmark%d.txt" % i)
-        i += 1
+def create_logfile(path):
+    if os.path.isdir(path):
+        i = 1
+        file = None
+        while not file or os.path.exists(file):
+            file = os.path.join(path, "benchmark%d.txt" % i)
+            i += 1
 
-    return open(path, 'w')
+        return open(file, 'w')
+    else:
+        return open(path, 'w')
 
 
 def benchmark_files(directory, out_path):
     with create_logfile(out_path) as logfile:
         logfile.write("Runtimes\n-------------------\n")
+
+        if not os.path.isdir(out_path):
+            out_path = os.path.dirname(out_path)
 
         # Run all benchmarks in directory
         files = os.listdir(directory)
@@ -43,9 +49,9 @@ def __benchmark_example(cls, sizes, n_flows, logfile):
     x = []
     runtimes = []
 
-    for i, n in enumerate(sizes):  # TODO: use zip() here
-        attack = cls(n)
-        checker = AttackChecker.from_execution(attack, n_flows[i])
+    for size, n in zip(sizes, n_flows):
+        attack = cls(size)
+        checker = AttackChecker.from_execution(attack, n)
         nc = NetworkChecker(checker)
 
         start_time = time.time()

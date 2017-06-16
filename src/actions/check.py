@@ -38,7 +38,7 @@ class NetworkChecker(object):
             else:
                 nr = NetworkRenderer(self.checker.network, None)
                 nr.render(out_prefix + "network")
-                print("Network rendering is located at:\n%s-network.pdf" % out_prefix)
+                print("Network rendering is located at:\n%snetwork.pdf" % out_prefix)
 
         log.print_sep()
 

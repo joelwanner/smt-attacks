@@ -35,12 +35,12 @@ python src/smtdos.py --benchmark
 
 ## Authors
 
-* **Joel Wanner** – [Github](https://github.com/joelwanner)
+* Joel Wanne – [Github](https://github.com/joelwanner)
 
 Supervised by
-* **Prof. Dr. Adrian Perrig**
-* **Samuel Hitz**
+* Prof. Dr. Adrian Perrig
+* Samuel Hitz
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details
+This project is licensed under the MIT License – see the [LICENSE.txt](LICENSE.txt) file for details
