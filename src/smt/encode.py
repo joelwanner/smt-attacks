@@ -62,14 +62,13 @@ class ModelEncoder(object):
             r = m.fpIdInv(rid)
 
             f_is_response = m.Flow.type(f) == m.RESPONSE
-            r_is_request = m.Flow.type(r) == m.REQUEST
             host_matches = m.Flow.src(f) == m.Flow.dest(r)
             distinct = Not(f == r)
 
             # Ensure that there is no other response that is mapped to the same request
             is_lone_response = And([Not(m.fReq(g) == rid) for g in m.flows if not g == f])
 
-            yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
+            yield Implies(f_is_response, And(host_matches, distinct, is_lone_response))
 
     # (F4) Definition of sent function
     # -------------------------------------------
