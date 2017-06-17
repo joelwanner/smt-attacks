@@ -4,7 +4,6 @@ import time
 import interface.log as log
 from actions.check import NetworkChecker
 from generators.crafted import AmplificationNetwork, CoremeltNetwork
-from smt.check import AttackChecker
 
 
 def create_logfile(path):
@@ -20,7 +19,7 @@ def create_logfile(path):
         return open(path, 'w')
 
 
-def benchmark_files(directory, out_path):
+def benchmark_files(directory, out_path, ac_cls):
     with create_logfile(out_path) as logfile:
         logfile.write("Runtimes\n-------------------\n")
 
@@ -36,7 +35,7 @@ def benchmark_files(directory, out_path):
                 print()
                 log.print_header("BENCHMARK %d/%d" % (i + 1, n), filename)
 
-                checker = NetworkChecker.from_file(os.path.join(directory, filename), 10, render=False, verbose=False)
+                checker = NetworkChecker.from_file(os.path.join(directory, filename), ac_cls, 10, render=False, verbose=False)
 
                 start_time = time.time()
                 checker.check_attack(out_path)
@@ -45,13 +44,13 @@ def benchmark_files(directory, out_path):
                 logfile.write("%s: %.3f\n" % (filename, runtime))
 
 
-def __benchmark_example(cls, sizes, n_flows, logfile):
+def __benchmark_example(attack_cls, ac_cls, sizes, n_flows, logfile):
     x = []
     runtimes = []
 
     for size, n in zip(sizes, n_flows):
-        attack = cls(size)
-        checker = AttackChecker.from_execution(attack, n)
+        attack = attack_cls(size)
+        checker = ac_cls.from_network(attack, n)
         nc = NetworkChecker(checker)
 
         start_time = time.time()
@@ -69,12 +68,12 @@ def __benchmark_example(cls, sizes, n_flows, logfile):
     logfile.write("x = [%s]\ny = [%s]\n" % (x_str, y_str))
 
 
-def benchmark_examples(out_path, sizes):
+def benchmark_examples(out_path, sizes, ac_cls):
     with create_logfile(out_path) as logfile:
         log.print_header("Server Amplification Attacks")
         logfile.write("Server Amplification Attack\n")
-        __benchmark_example(AmplificationNetwork, sizes, [2 * n for n in sizes], logfile)
+        __benchmark_example(AmplificationNetwork, ac_cls, sizes, [2 * n for n in sizes], logfile)
 
         log.print_header("Coremelt Attacks")
         logfile.write("\nCoremelt Attack\n")
-        __benchmark_example(CoremeltNetwork, sizes, [2 * n for n in sizes], logfile)
+        __benchmark_example(CoremeltNetwork, ac_cls, sizes, [2 * n for n in sizes], logfile)

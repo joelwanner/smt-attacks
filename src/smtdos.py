@@ -93,13 +93,13 @@ if __name__ == '__main__':
 
     if args.benchmark:
         if args.benchmark == 'examples':
-            benchmark_files(EXAMPLES_PATH, output)
+            benchmark_files(EXAMPLES_PATH, output, Checker)
 
         elif args.benchmark == 'crafted':
             lower = input("Smallest size: ")
             upper = input("Largest size: ")
             try:
-                benchmark_examples(output, range(int(lower), int(upper) + 1))
+                benchmark_examples(output, range(int(lower), int(upper) + 1), checker)
             except ValueError:
                 print("Invalid arguments")
 

@@ -2,6 +2,7 @@ from collections import namedtuple
 
 from max_flow.flow import *
 from max_flow.graph import *
+from network.topology import Host
 
 
 class MaxFlow(object):
@@ -67,10 +68,11 @@ class MaxFlow(object):
         vertices.append(t)
 
         for v in self.victims:
-            v_in = self.clusters[v].v_in
-            e = Edge(v_in, t, None)
-            e_rev = Edge(t, v_in, None)
-            edges.extend([e, e_rev])
+            if isinstance(v, Host):
+                v_in = self.clusters[v].v_in
+                e = Edge(v_in, t, None)
+                e_rev = Edge(t, v_in, None)
+                edges.extend([e, e_rev])
 
         return FlowGraph(vertices, edges, s, t, amp_factors)
 
@@ -83,7 +85,6 @@ class MaxFlow(object):
             if not paths:
                 break
 
-            print("Iterating through %d paths" % len(paths))
             best_path = None
             flow_to_send = 0
             max_benefit = 0
@@ -99,7 +100,6 @@ class MaxFlow(object):
             if max_benefit <= 0:
                 break
 
-            print("Sending %f flow through %s" % (flow_to_send, best_path))
             self.send_flow(best_path, flow_to_send)
             paths.remove(best_path)
 
@@ -118,7 +118,9 @@ class MaxFlow(object):
 
     def flow_to_victim(self, v):
         flow = 0
-        for e in self.clusters[v].v_in.in_edges:
-            flow += self.flow.get(e)
+
+        if isinstance(v, Host):
+            for e in self.clusters[v].v_in.in_edges:
+                flow += self.flow.get(e)
 
         return flow

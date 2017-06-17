@@ -35,14 +35,16 @@ class AttackChecker:
 
     def check_host_attacks(self):
         if not self.attackers:
-            potential_attackers = [h for h in self.topology.hosts if not (isinstance(h, Server) or h == self.victims)]
+            potential_attackers = [h for h in self.topology.hosts
+                                   if not (isinstance(h, Server) or (self.victims and h in self.victims))]
         else:
             potential_attackers = self.attackers
 
         # Single victim is specified
         if self.victims and len(self.victims) == 1:
             # Check attack on single victim
-            attack = self.check_network(Network(self.topology, self.n_flows, self.victims, potential_attackers))
+            n = Network(self.topology, self.n_flows, self.victims, potential_attackers)
+            attack = self.check_network(n)
             if attack:
                 self.attacks.append(attack)
                 return [attack]
@@ -62,7 +64,7 @@ class AttackChecker:
             while potential_victims:
                 # Perform first check to see which hosts can be attacked
                 print("Looking for attacks on %s" % potential_victims)
-                e = Network(self.topology, self.n_flows, potential_victims, self.attackers)
+                e = Network(self.topology, self.n_flows, potential_victims, potential_attackers)
                 attack = self.check_network(e)
 
                 if attack:
@@ -107,7 +109,7 @@ class AttackChecker:
         return parser.parse_attack(cls, s, n_flows)
 
     @classmethod
-    def from_execution(cls, e, n_flows):
-        victim_hosts = [h for h in e.victims if isinstance(h, Host)]
-        victim_links = [h for h in e.victims if isinstance(h, Link)]
-        return cls(e.network, n_flows, victim_hosts, victim_links, e.attackers)
+    def from_network(cls, n, n_flows):
+        victim_hosts = [h for h in n.victims if isinstance(h, Host)]
+        victim_links = [h for h in n.victims if isinstance(h, Link)]
+        return cls(n.network, n_flows, victim_hosts, victim_links, n.attackers)
