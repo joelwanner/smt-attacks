@@ -25,6 +25,8 @@ if __name__ == '__main__':
     parser.add_argument('-n', help="number of flows in the model")
     parser.add_argument('-o', help="output path")
 
+    parser.add_argument('--maxflow', action='store_true')
+
     args = parser.parse_args()
 
     if not os.path.exists(OUTPUT_PATH):

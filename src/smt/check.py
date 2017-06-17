@@ -19,8 +19,8 @@ class AttackChecker:
         self.attacks = []
         self.verbose = False
 
-    def __check_execution(self, execution):
-        encoder = ModelEncoder(execution, self.n_flows)
+    def check_network(self, network):
+        encoder = ModelEncoder(network, self.n_flows)
         assertions = encoder.get_assertions()
 
         solver = SmtSolver(verbose=self.verbose)
@@ -28,11 +28,11 @@ class AttackChecker:
 
         if result == sat:
             decoder = ModelDecoder(encoder.model, solver.model)
-            execution.flows = decoder.flows()
-            execution.victims = decoder.victims()
-            execution.attackers = decoder.attackers()
+            network.flows = decoder.flows()
+            network.victims = decoder.victims()
+            network.attackers = decoder.attackers()
 
-            return execution
+            return network
         else:
             return None
 
@@ -45,7 +45,7 @@ class AttackChecker:
         # Single victim is specified
         if self.victims and len(self.victims) == 1:
             # Check attack on single victim
-            attack = self.__check_execution(Network(self.network, self.n_flows, self.victims, potential_attackers))
+            attack = self.check_network(Network(self.network, self.n_flows, self.victims, potential_attackers))
             if attack:
                 self.attacks.append(attack)
                 return [attack]
@@ -66,7 +66,7 @@ class AttackChecker:
                 # Perform first check to see which hosts can be attacked
                 print("Looking for attacks on %s" % potential_victims)
                 e = Network(self.network, self.n_flows, potential_victims, self.attackers)
-                attack = self.__check_execution(e)
+                attack = self.check_network(e)
 
                 if attack:
                     print("Potential victims: %s" % attack.victims)
@@ -83,7 +83,7 @@ class AttackChecker:
                             print("Checking attack on victim %s" % v.__repr__())
 
                             attackers = [h for h in potential_attackers if h != v]
-                            attack = self.__check_execution(Network(self.network, self.n_flows, [v], attackers))
+                            attack = self.check_network(Network(self.network, self.n_flows, [v], attackers))
 
                             if attack:
                                 self.attacks.append(attack)
@@ -98,7 +98,7 @@ class AttackChecker:
         else:
             potential_attackers = self.attackers
 
-        attack = self.__check_execution(Network(self.network, self.n_flows, self.target_links, potential_attackers))
+        attack = self.check_network(Network(self.network, self.n_flows, self.target_links, potential_attackers))
 
         if attack:
             return [attack]
