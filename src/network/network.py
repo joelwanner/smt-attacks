@@ -1,8 +1,8 @@
 
 
 class Network(object):
-    def __init__(self, network, n_flows, victims=None, attackers=None):
-        self.network = network
+    def __init__(self, topology, n_flows, victims=None, attackers=None):
+        self.topology = topology
         self.victims = victims
         self.attackers = attackers
 
@@ -13,7 +13,7 @@ class Network(object):
         self.flows = flows
 
     def __str__(self):
-        s = "%s\nflows: %d\n" % (self.network.__str__(), self.n_flows)
+        s = "%s\nflows: %d\n" % (self.topology.__str__(), self.n_flows)
 
         if self.victims:
             victims_str = ", ".join([v.__repr__() for v in self.victims])

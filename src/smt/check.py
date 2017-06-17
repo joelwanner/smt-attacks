@@ -6,11 +6,8 @@ from smt.solve import *
 
 
 class AttackChecker:
-    def __init__(self, network, n_flows, victims=None, links=None, attackers=None):
-        if n_flows <= 0:
-            raise ValueError("Invalid number of flows specified")
-
-        self.network = network
+    def __init__(self, topology, n_flows, victims=None, links=None, attackers=None):
+        self.topology = topology
         self.n_flows = n_flows
         self.victims = victims
         self.target_links = links
@@ -38,14 +35,14 @@ class AttackChecker:
 
     def check_host_attacks(self):
         if not self.attackers:
-            potential_attackers = [h for h in self.network.hosts if not (isinstance(h, Server) or h == self.victims)]
+            potential_attackers = [h for h in self.topology.hosts if not (isinstance(h, Server) or h == self.victims)]
         else:
             potential_attackers = self.attackers
 
         # Single victim is specified
         if self.victims and len(self.victims) == 1:
             # Check attack on single victim
-            attack = self.check_network(Network(self.network, self.n_flows, self.victims, potential_attackers))
+            attack = self.check_network(Network(self.topology, self.n_flows, self.victims, potential_attackers))
             if attack:
                 self.attacks.append(attack)
                 return [attack]
@@ -58,14 +55,14 @@ class AttackChecker:
                 potential_victims = set(self.victims)
             else:
                 if self.attackers:
-                    potential_victims = set([h for h in self.network.hosts if h not in self.attackers])
+                    potential_victims = set([h for h in self.topology.hosts if h not in self.attackers])
                 else:
-                    potential_victims = set(self.network.hosts)
+                    potential_victims = set(self.topology.hosts)
 
             while potential_victims:
                 # Perform first check to see which hosts can be attacked
                 print("Looking for attacks on %s" % potential_victims)
-                e = Network(self.network, self.n_flows, potential_victims, self.attackers)
+                e = Network(self.topology, self.n_flows, potential_victims, self.attackers)
                 attack = self.check_network(e)
 
                 if attack:
@@ -83,7 +80,7 @@ class AttackChecker:
                             print("Checking attack on victim %s" % v.__repr__())
 
                             attackers = [h for h in potential_attackers if h != v]
-                            attack = self.check_network(Network(self.network, self.n_flows, [v], attackers))
+                            attack = self.check_network(Network(self.topology, self.n_flows, [v], attackers))
 
                             if attack:
                                 self.attacks.append(attack)
@@ -94,11 +91,11 @@ class AttackChecker:
 
     def check_link_attack(self):
         if not self.attackers:
-            potential_attackers = [h for h in self.network.hosts if not (isinstance(h, Server) or h == self.victims)]
+            potential_attackers = [h for h in self.topology.hosts if not (isinstance(h, Server) or h == self.victims)]
         else:
             potential_attackers = self.attackers
 
-        attack = self.check_network(Network(self.network, self.n_flows, self.target_links, potential_attackers))
+        attack = self.check_network(Network(self.topology, self.n_flows, self.target_links, potential_attackers))
 
         if attack:
             return [attack]
@@ -107,7 +104,7 @@ class AttackChecker:
 
     @classmethod
     def from_string(cls, s, n_flows):
-        return parser.parse_attack(s, n_flows)
+        return parser.parse_attack(cls, s, n_flows)
 
     @classmethod
     def from_execution(cls, e, n_flows):

@@ -14,9 +14,8 @@ class NetworkRenderer(object):
     label_size = 10
     node_fontsize = 8
 
-    def __init__(self, network, execution=None):
+    def __init__(self, network):
         self.network = network
-        self.execution = execution
 
         self.graph = self.create_graph()
 
@@ -42,33 +41,33 @@ class NetworkRenderer(object):
         g = pydot.Dot(graph_type='digraph')
         node_map = {}
 
-        for h in self.network.hosts:
+        for h in self.network.topology.hosts:
             label = "<<B>%s</B><br/>%d  %d<br/>%d>" % (h.name, h.receiving_cap, h.sending_cap, h.amp_factor)
 
             n = pydot.Node(h.name, label=label, style='filled', margin=-0.8, width=0.5, height=0.5,
                            fontname=self.font_name, fontsize=self.node_fontsize)
 
             if type(h) is Server:
-                if self.execution and h in self.execution.victims:
+                if self.network.victims and h in self.network.victims:
                     n.set_shape('doublecircle')
                 else:
                     n.set_shape('Mcircle')
 
                 n.set_fillcolor(self.server_color)
             elif type(h) is Router:
-                if self.execution and h in self.execution.victims:
+                if self.network.victims and h in self.network.victims:
                     n.set_shape('doubleoctagon')
                 else:
                     n.set_shape('octagon')
 
                 n.set_fillcolor(self.server_color)
             else:
-                if self.execution and h in self.execution.victims:
+                if self.network.victims and h in self.network.victims:
                     n.set_shape('doublecircle')
                 else:
                     n.set_shape('circle')
 
-                if self.execution and h in self.execution.attackers:
+                if self.network.attackers and h in self.network.attackers:
                     n.set_fillcolor(self.attacker_color)
                 else:
                     n.set_fillcolor(self.host_color)
@@ -76,7 +75,7 @@ class NetworkRenderer(object):
             g.add_node(n)
             node_map[h] = n
 
-        for l in self.network.links:
+        for l in self.network.topology.links:
             v1 = node_map[l.h1]
             v2 = node_map[l.h2]
 
@@ -84,9 +83,9 @@ class NetworkRenderer(object):
                            fontname=self.font_name, fontsize=self.label_size)
             g.add_edge(e)
 
-            if self.execution:
-                f1 = sum([f.get(l.h1, l.h2) for f in self.execution.flows])
-                f2 = sum([f.get(l.h2, l.h1) for f in self.execution.flows])
+            if self.network.flows:
+                f1 = sum([f.get(l.h1, l.h2) for f in self.network.flows])
+                f2 = sum([f.get(l.h2, l.h1) for f in self.network.flows])
                 residual = l.capacity - f1 - f2
 
                 if residual == l.capacity:

@@ -1,7 +1,6 @@
 import re
 
 from network.topology import *
-import smt.check
 
 
 def parse_network(s):
@@ -67,7 +66,7 @@ def parse_network(s):
     return Topology(hosts, links)
 
 
-def parse_attack(s, n_flows):
+def parse_attack(ac_cls, s, n_flows):
     network = Topology.from_string(s)
     victims = None
     attackers = None
@@ -91,4 +90,4 @@ def parse_attack(s, n_flows):
 
     # TODO: check if attackers and victims are disjoint
 
-    return smt.check.AttackChecker(network, n_flows, victims, attackers)
+    return ac_cls(network, n_flows, victims, attackers)

@@ -5,7 +5,8 @@ from actions.check import NetworkChecker
 from actions.generate import Generator
 from actions.benchmark import benchmark_files, benchmark_examples
 from generators.random import RandomTopology
-from smt.check import AttackChecker
+import smt.check
+import max_flow.check
 
 
 EXAMPLES_PATH = "examples/"
@@ -41,6 +42,11 @@ if __name__ == '__main__':
         output = args.o
     else:
         output = OUTPUT_PATH
+
+    if args.maxflow:
+        Checker = max_flow.check.AttackChecker
+    else:
+        Checker = smt.check.AttackChecker
 
     if args.file:
         checker = NetworkChecker.from_file(args.file, n_flows, verbose=args.debug)
@@ -82,7 +88,7 @@ if __name__ == '__main__':
 
     if args.example:
         path = os.path.join(EXAMPLES_PATH, args.example + ".txt")
-        checker = NetworkChecker.from_file(path, n_flows, verbose=args.debug)
+        checker = NetworkChecker.from_file(path, Checker, n_flows, verbose=args.debug)
         checker.check_attack(output)
 
     if args.benchmark:
@@ -99,6 +105,6 @@ if __name__ == '__main__':
 
     if args.random:
         network = RandomTopology(int(args.random))
-        checker = AttackChecker(network, 10)
+        checker = Checker(network, 10)
         nc = NetworkChecker(checker, "random", verbose=args.debug)
         nc.check_attack(output)

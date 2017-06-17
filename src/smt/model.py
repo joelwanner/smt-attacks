@@ -3,9 +3,9 @@ from z3 import *
 
 class Model(object):
     def __init__(self, execution, n_flows):
-        self.hosts = execution.network.hosts
-        self.links = execution.network.links
-        self.routes = execution.network.get_routes()
+        self.hosts = execution.topology.hosts
+        self.links = execution.topology.links
+        self.routes = execution.topology.get_routes()
 
         self.victims = execution.victims
         self.attackers = execution.attackers
