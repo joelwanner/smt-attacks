@@ -113,7 +113,7 @@ class ModelEncoder(object):
             not_from_server = And([Not(src == m.host_map[s]) for s in servers])
             server_rule = Implies(is_request, not_from_server)
 
-            switch_rule = And([Not(src == m.host_map[s]) for s in switches])
+            switch_rule = And([Not(Or(src == m.host_map[s], dest == m.host_map[s])) for s in switches])
 
             yield And(distinct, positive_size, server_rule, switch_rule)
 

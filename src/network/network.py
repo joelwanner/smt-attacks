@@ -9,9 +9,6 @@ class Network(object):
         self.n_flows = n_flows
         self.flows = None
 
-    def set_flows(self, flows):
-        self.flows = flows
-
     def __str__(self):
         s = "%s\nflows: %d\n" % (self.topology.__str__(), self.n_flows)
 
