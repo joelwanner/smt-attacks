@@ -3,14 +3,16 @@ from collections import namedtuple
 from max_flow.flow import *
 from max_flow.graph import *
 from network.topology import Host
+from network.flow import Flow
+from network.route import Route
 
 
 class MaxFlow(object):
     def __init__(self, network):
-        self.network = network.topology
+        self.topology = network.topology
         self.victims = network.victims
         self.attackers = network.attackers
-        self.flow = Flow()
+        self.flow = GraphFlow()
 
         self.graph = self.__create_graph()
 
@@ -22,7 +24,7 @@ class MaxFlow(object):
         self.clusters = {}
         amp_factors = {}
 
-        for h in self.network.hosts:
+        for h in self.topology.hosts:
             label = h.name
             v = Vertex(label)
             v_in = Vertex(label + "_in")
@@ -42,7 +44,7 @@ class MaxFlow(object):
                 e_out_rev = Edge(v_out, v, 0)
                 edges.extend([e_out, e_out_rev])
 
-        for l in self.network.links:
+        for l in self.topology.links:
             c1 = self.clusters[l.h1]
             c2 = self.clusters[l.h2]
 
@@ -124,3 +126,27 @@ class MaxFlow(object):
                 flow += self.flow.get(e)
 
         return flow
+
+    def get_flows(self):
+        flows = []
+
+        for l in self.topology.links:
+            u_in = self.clusters[l.h1].v_in
+            u_out = self.clusters[l.h1].v_out
+            v_in = self.clusters[l.h2].v_in
+            v_out = self.clusters[l.h2].v_out
+
+            e1 = self.graph.get_edge(u_out, v_in)
+            e2 = self.graph.get_edge(v_out, u_in)
+            f1 = self.flow.get(e1)
+            f2 = self.flow.get(e2)
+
+            if f1 > 0:
+                r = Route(l.h1, l.h2, hops=[l.h2])
+                flows.append(Flow(r, f1))
+            if f2 > 0:
+                r = Route(l.h2, l.h1, hops=[l.h1])
+                flows.append(Flow(r, f2))
+
+        print(flows)
+        return flows

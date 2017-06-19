@@ -13,13 +13,14 @@ class AttackChecker(smt.check.AttackChecker):
         mf.compute_flow()
 
         attacked_hosts = []
-
         for v in network.victims:
             if isinstance(v, Host) and mf.flow_to_victim(v) > v.receiving_cap:
                 attacked_hosts.append(v)
 
         if attacked_hosts:
-            return Network(self.topology, 0, attacked_hosts, network.attackers)
+            network.victims = attacked_hosts
+            network.flows = mf.get_flows()
+            return network
         else:
             return None
 

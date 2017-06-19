@@ -1,10 +1,10 @@
 
 
 class Flow(object):
-    def __init__(self, fid, route, amount):
-        self.id = fid
+    def __init__(self, route, amount, fid="f"):
         self.route = route
         self.amount = amount
+        self.id = fid
 
     def __repr__(self):
         return self.id

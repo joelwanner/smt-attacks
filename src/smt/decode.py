@@ -32,7 +32,7 @@ class ModelDecoder(object):
 
                 # We may assume that the routes taken by flows are the pre-computed ones
                 route = m.routes.get_route(self.__host_for_expr(src), self.__host_for_expr(dest))
-                flows.append(Flow(id_str, route, size))
+                flows.append(Flow(route, size, id_str))
 
         return flows
 

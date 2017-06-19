@@ -1,6 +1,6 @@
 
 
-class Flow(object):
+class GraphFlow(object):
     def __init__(self):
         self.__map = {}
 
