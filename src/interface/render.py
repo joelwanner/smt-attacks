@@ -19,8 +19,12 @@ class NetworkRenderer(object):
 
         self.graph = self.create_graph()
 
+    def write_dot(self, output):
+        with open(output + ".dot", "w") as f:
+            f.write(self.graph.to_string())
+
     def render(self, output):
-        self.graph.write_pdf(output + ".pdf")
+        self.graph.write(output + ".pdf")
 
     def __create_link_flow(self, h1, h2, f):
         e = pydot.Edge(h1, h2)

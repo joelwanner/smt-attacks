@@ -35,7 +35,7 @@ python src/smtdos.py --benchmark
 
 ## Authors
 
-* Joel Wanne – [Github](https://github.com/joelwanner)
+* Joel Wanner – [Github](https://github.com/joelwanner)
 
 Supervised by
 * Prof. Dr. Adrian Perrig
