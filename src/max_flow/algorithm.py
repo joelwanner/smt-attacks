@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from max_flow.flow import *
 from max_flow.graph import *
-from network.topology import Host
+from network.topology import Host, Link
 from network.flow import Flow
 from network.route import Route
 
@@ -22,6 +22,7 @@ class MaxFlow(object):
 
         Cluster = namedtuple('Cluster', 'v v_in v_out')
         self.clusters = {}
+        self.targeted_links = {}
         amp_factors = {}
 
         for h in self.topology.hosts:
@@ -48,16 +49,33 @@ class MaxFlow(object):
             c1 = self.clusters[l.h1]
             c2 = self.clusters[l.h2]
 
-            e1 = Edge(c1.v_out, c2.v_in, l.capacity)
-            e2 = Edge(c2.v_out, c1.v_in, l.capacity)
-            e1_rev = Edge(c2.v_in, c1.v_out, 0)
-            e2_rev = Edge(c1.v_in, c2.v_out, 0)
+            if l not in self.victims:
+                e1 = Edge(c1.v_out, c2.v_in, l.capacity)
+                e2 = Edge(c2.v_out, c1.v_in, l.capacity)
+                e1_rev = Edge(c2.v_in, c1.v_out, 0)
+                e2_rev = Edge(c1.v_in, c2.v_out, 0)
 
-            # Victims are passive in the network: they are not allowed to send
-            if l.h1 not in self.victims:
-                edges.extend([e1, e1_rev])
-            if l.h2 not in self.victims:
-                edges.extend([e2, e2_rev])
+                # Victims are passive in the network: they are not allowed to send
+                if l.h1 not in self.victims:
+                    edges.extend([e1, e1_rev])
+                if l.h2 not in self.victims:
+                    edges.extend([e2, e2_rev])
+            else:
+                vl = Vertex("l%d" % (len(self.targeted_links) + 1))
+                vertices.append(vl)
+                self.targeted_links[l] = vl
+
+                e1a = Edge(c1.v_out, vl, None)
+                e1b = Edge(vl, c2.v_in, None)
+                e2a = Edge(c2.v_out, vl, None)
+                e2b = Edge(vl, c1.v_in, None)
+
+                e1a_rev = Edge(vl, c1.v_out, 0)
+                e1b_rev = Edge(c2.v_in, vl, 0)
+                e2a_rev = Edge(vl, c2.v_out, 0)
+                e2b_rev = Edge(c1.v_in, vl, 0)
+
+                edges.extend([e1a, e1b, e2a, e2b, e1a_rev, e1b_rev, e2a_rev, e2b_rev])
 
         s = Vertex("s")
         vertices.append(s)
@@ -68,12 +86,19 @@ class MaxFlow(object):
 
         t = Vertex("t")
         vertices.append(t)
+        self.sink = t
 
         for v in self.victims:
             if isinstance(v, Host):
                 v_in = self.clusters[v].v_in
                 e = Edge(v_in, t, None)
                 e_rev = Edge(t, v_in, None)
+                edges.extend([e, e_rev])
+
+            elif isinstance(v, Link):
+                vl = self.targeted_links[v]
+                e = Edge(vl, t, None)
+                e_rev = Edge(t, vl, None)
                 edges.extend([e, e_rev])
 
         return FlowGraph(vertices, edges, s, t, amp_factors)
@@ -119,13 +144,24 @@ class MaxFlow(object):
                 self.flow.set(e_reverse, f - delta)
 
     def flow_to_victim(self, v):
-        flow = 0
-
         if isinstance(v, Host):
-            for e in self.clusters[v].v_in.in_edges:
-                flow += self.flow.get(e)
+            e = self.graph.get_edge(self.clusters[v].v_in, self.sink)
+        elif isinstance(v, Link):
+            e = self.graph.get_edge(self.targeted_links[v], self.sink)
+        else:
+            return 0
 
-        return flow
+        return self.flow.get(e)
+
+    def get_victims(self):
+        victims = []
+        for v in self.victims:
+            if isinstance(v, Host) and self.flow_to_victim(v) > v.receiving_cap:
+                victims.append(v)
+            elif isinstance(v, Link) and self.flow_to_victim(v) > v.capacity:
+                victims.append(v)
+
+        return victims
 
     def get_flows(self):
         flows = []
@@ -148,5 +184,4 @@ class MaxFlow(object):
                 r = Route(l.h2, l.h1, hops=[l.h1])
                 flows.append(Flow(r, f2))
 
-        print(flows)
         return flows

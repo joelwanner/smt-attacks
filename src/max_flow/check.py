@@ -11,14 +11,10 @@ class AttackChecker(smt.check.AttackChecker):
     def check_network(self, network):
         mf = MaxFlow(network)
         mf.compute_flow()
+        victims = mf.get_victims()
 
-        attacked_hosts = []
-        for v in network.victims:
-            if isinstance(v, Host) and mf.flow_to_victim(v) > v.receiving_cap:
-                attacked_hosts.append(v)
-
-        if attacked_hosts:
-            network.victims = attacked_hosts
+        if victims:
+            network.victims = victims
             network.flows = mf.get_flows()
             return network
         else:
