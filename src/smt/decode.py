@@ -51,10 +51,5 @@ class ModelDecoder(object):
         return victims
 
     def attackers(self):
-        attackers = []
-        for h in self.network.hosts:
-            s = self.network.mk_units_sent(h)
-            if self.model.evaluate(And(s > h.sending_cap)):
-                attackers.append(h)
-
-        return attackers
+        # TODO: Implement attacker finding procedure
+        return []
