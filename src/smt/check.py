@@ -112,4 +112,4 @@ class AttackChecker:
     def from_network(cls, n, n_flows):
         victim_hosts = [h for h in n.victims if isinstance(h, Host)]
         victim_links = [h for h in n.victims if isinstance(h, Link)]
-        return cls(n.network, n_flows, victim_hosts, victim_links, n.attackers)
+        return cls(n.topology, n_flows, victim_hosts, victim_links, n.attackers)

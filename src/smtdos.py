@@ -3,7 +3,7 @@ import os
 
 from actions.check import NetworkChecker
 from actions.generate import Generator
-from actions.benchmark import benchmark_files, benchmark_examples
+from actions.benchmark import Benchmark
 from generators.random import RandomTopology
 import smt.check
 import max_flow.check
@@ -92,16 +92,20 @@ if __name__ == '__main__':
         checker.check_attack(output)
 
     if args.benchmark:
-        if args.benchmark == 'examples':
-            benchmark_files(EXAMPLES_PATH, output, Checker)
+        try:
+            k = int(input("Number of runs for each network: "))
+            b = Benchmark(output, Checker, k)
 
-        elif args.benchmark == 'crafted':
-            lower = input("Smallest size: ")
-            upper = input("Largest size: ")
-            try:
-                benchmark_examples(output, range(int(lower), int(upper) + 1), checker)
-            except ValueError:
-                print("Invalid arguments")
+            if args.benchmark == 'examples':
+                b.run_files(EXAMPLES_PATH)
+
+            elif args.benchmark == 'crafted':
+                lower = int(input("Smallest size: "))
+                upper = int(input("Largest size: "))
+                b.run_examples(range(lower, upper + 1))
+
+        except ValueError:
+            print("Input is not a number")
 
     if args.random:
         network = RandomTopology(int(args.random))
