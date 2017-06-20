@@ -10,11 +10,7 @@ class Benchmark(object):
     def __init__(self, output_path, ac_cls, n_runs):
         self.ac_cls = ac_cls
         self.n_runs = n_runs
-
-        if os.path.isdir(output_path):
-            self.out_path = output_path
-        else:
-            self.out_path = os.path.dirname(output_path)
+        self.out_path = output_path
 
     def run_files(self, directory):
         with self.create_logfile() as logfile:
@@ -60,6 +56,7 @@ class Benchmark(object):
             n_hosts = None
 
             for k in range(self.n_runs):
+                print("Run %d/%d of network %s(%d)" % (k + 1, self.n_runs, attack_cls, n))
                 attack = attack_cls(size)
                 checker = self.ac_cls.from_network(attack, n)
                 nc = NetworkChecker(checker)
@@ -73,10 +70,10 @@ class Benchmark(object):
 
             runtime_str = ", ".join(["%.3f" % r for r in runs])
             x.append(n_hosts)
-            runtimes.append(runtime_str)
+            runtimes.append("[%s]" % runtime_str)
 
         x_str = ", ".join(["%d" % n for n in x])
-        y_str = ", ".join(["%.3f" % t for t in runtimes])
+        y_str = ", ".join(runtimes)
         logfile.write("x = [%s]\ny = [%s]\n" % (x_str, y_str))
 
     def create_logfile(self):
