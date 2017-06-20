@@ -2,6 +2,8 @@ from z3 import *
 
 
 class Model(object):
+    n_states = 6
+
     def __init__(self, execution, n_flows):
         self.hosts = execution.topology.hosts
         self.links = execution.topology.links
@@ -45,7 +47,14 @@ class Model(object):
         self.fRoute = Function('route', Host, Host, Route)
         self.fNext = Function('next', Host, Host, Host)
 
-        self.fSent = Function('sent', Host, Host, Flow, IntSort())
+        self.fSent = Function('sent', Host, Host, Flow, IntSort(), IntSort())
+
+        # States
+        # --------------------------
+        self.states = []
+        for i in range(self.n_states):
+            s = Function('s%d' % i, Flow, ArraySort(Host, BoolSort()))
+            self.states.append(s)
 
         # Set public fields
         # --------------------------
@@ -55,14 +64,14 @@ class Model(object):
     #    Helper Functions   #
     # --------------------- #
 
-    def mk_units_sent_to(self, src, dest):
-        return Sum([self.fSent(self.host_map[src], self.host_map[dest], f) for f in self.flows])
+    def mk_units_sent_to(self, src, dest, t):
+        return Sum([self.fSent(self.host_map[src], self.host_map[dest], f, t) for f in self.flows])
 
-    def mk_units_sent(self, h):
-        return Sum([self.mk_units_sent_to(h, l.neighbor(h)) for l in h.links])
+    def mk_units_sent(self, h, t):
+        return Sum([self.mk_units_sent_to(h, l.neighbor(h), t) for l in h.links])
 
-    def mk_units_recvd(self, h):
-        return Sum([self.mk_units_sent_to(l.neighbor(h), h) for l in h.links])
+    def mk_units_recvd(self, h, t):
+        return Sum([self.mk_units_sent_to(l.neighbor(h), h, t) for l in h.links])
 
-    def mk_units_over_link(self, l):
-        return self.mk_units_sent_to(l.h1, l.h2) + self.mk_units_sent_to(l.h2, l.h1)
+    def mk_units_over_link(self, l, t):
+        return self.mk_units_sent_to(l.h1, l.h2, t) + self.mk_units_sent_to(l.h2, l.h1, t)

@@ -65,27 +65,6 @@ class ModelEncoder(object):
 
             yield Implies(f_is_response, And(r_is_request, host_matches, distinct, is_lone_response))
 
-    # (F4) Definition of sent function
-    # -------------------------------------------
-    def __encode_f4(self, m):
-        for host in m.hosts:
-            h = m.host_map[host]
-            for l in host.links:
-                n = m.host_map[l.neighbor(host)]
-
-                for f in m.flows:
-                    src = m.Flow.src(f)
-                    dest = m.Flow.dest(f)
-
-                    size = m.Flow.size(f)
-                    result = m.fSent(h, n, f)
-
-                    h_in_route = Select(m.fRoute(src, dest), h)
-                    n_is_next_hop = n == m.fNext(h, dest)
-                    condition = And(h_in_route, n_is_next_hop)
-
-                    yield result == If(condition, size, 0)
-
     # (G1) General rules for instances of flows
     # -------------------------------------------
     def __encode_g1(self, m):
@@ -97,7 +76,7 @@ class ModelEncoder(object):
             dest = m.Flow.dest(f)
 
             distinct = Not(src == dest)
-            positive_size = m.Flow.size(f) >= 0
+            positive_size = m.Flow.size(f) > 0
 
             is_request = m.Flow.type(f) == m.REQUEST
             not_from_server = And([Not(src == m.host_map[s]) for s in servers])
@@ -123,26 +102,97 @@ class ModelEncoder(object):
 
                     yield Implies(And(is_response, belongs_to_host), amp_constraint)
 
-    # (C1) Host sending and receiving capacities
+    # (I1) Initial state constraint
     # -------------------------------------------
-    def __encode_c1(self, m):
-        for h in m.hosts:
-            if h not in m.victims:
-                yield m.mk_units_recvd(h) <= h.receiving_cap
-            else:
-                yield True
+    def __encode_i1(self, m):
+        s0 = m.states[0]
 
-            if h in m.victims and len(m.victims) == 1:
-                yield m.mk_units_sent(h) == 0  # Passive victim
-            else:
-                yield m.mk_units_sent(h) <= h.sending_cap
+        for host in m.hosts:
+            h = m.host_map[host]
+            for f in m.flows:
+                yield Not(Select(s0(f), h))
 
-    # (C2) Link capacities
+    # (S1) Definition of sent function
     # -------------------------------------------
-    def __encode_c2(self, m):
-        for l in m.links:
-            if l not in m.victims:
-                yield m.mk_units_over_link(l) <= l.capacity
+    def __encode_s1(self, m):
+        for t, s in enumerate(m.states):
+            for host in m.hosts:
+                h = m.host_map[host]
+                for l in host.links:
+                    n = m.host_map[l.neighbor(host)]
+
+                    for f in m.flows:
+                        dest = m.Flow.dest(f)
+                        size = m.Flow.size(f)
+                        result = m.fSent(h, n, f, t)
+
+                        h_was_active = Select(s(f), h)
+                        n_is_next_hop = n == m.fNext(h, dest)
+                        condition = And(h_was_active, n_is_next_hop)
+
+                        yield result == If(condition, size, 0)
+
+    # (S2) Host sending and receiving capacities
+    # -------------------------------------------
+    def __encode_s2(self, m):
+        for t in range(m.n_states):
+            for h in m.hosts:
+                if h not in m.victims:
+                    yield m.mk_units_recvd(h, t) <= h.receiving_cap
+                    yield m.mk_units_sent(h, t) <= h.sending_cap
+                else:
+                    if len(m.victims) == 1:
+                        yield m.mk_units_sent(h, t) == 0  # Passive victims
+                    else:
+                        yield True
+
+    # (S3) Link capacities
+    # -------------------------------------------
+    def __encode_s3(self, m):
+        for t in range(m.n_states):
+            for l in m.links:
+                if l not in m.victims:
+                    yield m.mk_units_over_link(l, t) <= l.capacity
+
+    # (T1) Forwarding rules
+    # -------------------------------------------
+    def __encode_t1(self, m):
+        for t in range(m.n_states - 1):
+            s_prev = m.states[t]
+            s_curr = m.states[t + 1]
+
+            for host in m.hosts:
+                h = m.host_map[host]
+                for f in m.flows:
+                    src = m.Flow.src(f)
+                    pred = m.fNext(h, src)
+
+                    is_not_src = Not(h == src)
+                    becomes_active = Select(s_curr(f), h)
+                    is_successor = h == m.fNext(pred, m.Flow.dest(f))
+                    pred_sent = Select(s_prev(f), pred)
+
+                    yield Implies(is_not_src, becomes_active == And(is_successor, pred_sent))
+
+    # (T2) Flow instantiation
+    # -------------------------------------------
+    def __encode_t2(self, m):
+        for t in range(m.n_states - 1):
+            s_prev = m.states[t]
+            s_curr = m.states[t + 1]
+
+            for f in m.flows:
+                src = m.Flow.src(f)
+                rid = m.fReq(f)
+                r = m.fpIdInv(rid)
+
+                src_is_active = Select(s_curr(f), src)
+                src_was_active = Select(s_curr(f), src)
+
+                is_response = m.Flow.type(f) == m.RESPONSE
+                req_arrived = Select(s_prev(r), m.Flow.dest(r))
+
+                yield Implies(And(src_is_active, is_response), Or(src_was_active, req_arrived))
 
     @staticmethod
     def __collect_assertions(m, *functions):
@@ -165,17 +215,20 @@ class ModelEncoder(object):
         m = self.model
 
         a = self.__collect_assertions(self.model,
-                                      self.__encode_f1, self.__encode_f2, self.__encode_f3, self.__encode_f4,
-                                      self.__encode_g1, self.__encode_g2,
-                                      self.__encode_c1, self.__encode_c2)
+                                      self.__encode_f1, self.__encode_f2, self.__encode_f3,
+                                      self.__encode_g1, self.__encode_g2, self.__encode_i1,
+                                      self.__encode_s1, self.__encode_s2, self.__encode_s3,
+                                      self.__encode_t1, self.__encode_t2)
 
         if m.victims:
             attack_properties = []
+
             for v in m.victims:
-                if isinstance(v, Host):
-                    attack_properties.append(m.mk_units_recvd(v) > v.receiving_cap)
-                elif isinstance(v, Link):
-                    attack_properties.append(m.mk_units_over_link(v) > v.capacity)
+                for t in range(m.n_states):
+                    if isinstance(v, Host):
+                        attack_properties.append(m.mk_units_recvd(v, t) > v.receiving_cap)
+                    elif isinstance(v, Link):
+                        attack_properties.append(m.mk_units_over_link(v, t) > v.capacity)
 
             a.append(Or(attack_properties))
 

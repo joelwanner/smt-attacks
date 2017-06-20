@@ -40,16 +40,18 @@ class ModelDecoder(object):
         return flows
 
     def victims(self):
-        victims = []
-        for h in self.network.hosts:
-            r = self.network.mk_units_recvd(h)
-            if self.model.evaluate(And(r > h.receiving_cap)):  # Hack to prevent AttributeError from Z3
-                victims.append(h)
+        victims = set()
 
-        for l in self.network.links:
-            s = self.network.mk_units_over_link(l)
-            if self.model.evaluate(And(s > l.capacity)):  # Hack to prevent AttributeError from Z3
-                victims.append(l)
+        for t in range(self.network.n_states):
+            for h in self.network.hosts:
+                r = self.network.mk_units_recvd(h, t)
+                if self.model.evaluate(And(r > h.receiving_cap)):  # Hack to prevent AttributeError from Z3
+                    victims.add(h)
+
+            for l in self.network.links:
+                s = self.network.mk_units_over_link(l, t)
+                if self.model.evaluate(And(s > l.capacity)):  # Hack to prevent AttributeError from Z3
+                    victims.add(l)
 
         return victims
 
