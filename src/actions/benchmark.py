@@ -14,7 +14,7 @@ class Benchmark(object):
         if os.path.isdir(output_path):
             self.out_path = output_path
         else:
-            self.out_path = os.path.dirname(self.out_path)
+            self.out_path = os.path.dirname(output_path)
 
     def run_files(self, directory):
         with self.create_logfile() as logfile:
