@@ -38,9 +38,8 @@ class Benchmark(object):
                         checker.check_attack(out_path=None)
                         runs.append(time.time() - start_time)
 
-                    runtime = sum(runs) / self.n_runs
-
-                    logfile.write("%s: %.3f\n" % (filename, runtime))
+                    runtime_str = ", ".join(["%.3f" % r for r in runs])
+                    logfile.write("%s: %s\n" % (filename, runtime_str))
 
     def run_examples(self, sizes):
         with self.create_logfile() as logfile:
@@ -72,11 +71,9 @@ class Benchmark(object):
                 if not n_hosts:
                     n_hosts = len(attack.topology.hosts)
 
-            runtime = sum(runs) / self.n_runs
-
-            print("Runtime for %d hosts: %.3fs" % (n_hosts, runtime))
+            runtime_str = ", ".join(["%.3f" % r for r in runs])
             x.append(n_hosts)
-            runtimes.append(runtime)
+            runtimes.append(runtime_str)
 
         x_str = ", ".join(["%d" % n for n in x])
         y_str = ", ".join(["%.3f" % t for t in runtimes])
