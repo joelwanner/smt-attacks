@@ -56,7 +56,7 @@ class Benchmark(object):
             n_hosts = None
 
             for k in range(self.n_runs):
-                print("Run %d/%d of network %s(%d)" % (k + 1, self.n_runs, attack_cls, n))
+                print("Run %d/%d of network %s(%d)" % (k + 1, self.n_runs, attack_cls, size))
                 attack = attack_cls(size)
                 checker = self.ac_cls.from_network(attack, n)
                 nc = NetworkChecker(checker)
