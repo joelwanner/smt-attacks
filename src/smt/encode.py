@@ -12,24 +12,20 @@ class ModelEncoder(object):
 
     # (F1) Inverse fId projection function
     # -------------------------------------------
-    def __encode_f1(self):
-        m = self.model
+    def __encode_f1(self, m):
         for i, f in enumerate(m.flows):
             yield m.fpIdInv(m.fids[i]) == f
 
     # (F2) Routing table setup
     # -------------------------------------------
-    def __encode_f2(self):
-        m = self.model
-        table = m.routes
-
+    def __encode_f2(self, m):
         for h_src in m.hosts:
             for h_dest in m.hosts:
                 src = m.host_map[h_src]
                 dest = m.host_map[h_dest]
                 r = m.fRoute(src, dest)
 
-                route = table.get_route(h_src, h_dest)
+                route = m.routes.get_route(h_src, h_dest)
                 hops = route.hops
 
                 if hops:
@@ -54,9 +50,7 @@ class ModelEncoder(object):
 
     # (F3) Request function constraints
     # -------------------------------------------
-    def __encode_f3(self):
-        m = self.model
-
+    def __encode_f3(self, m):
         for f in m.flows:
             rid = m.fReq(f)
             r = m.fpIdInv(rid)
@@ -73,9 +67,7 @@ class ModelEncoder(object):
 
     # (F4) Definition of sent function
     # -------------------------------------------
-    def __encode_f4(self):
-        m = self.model
-
+    def __encode_f4(self, m):
         for host in m.hosts:
             h = m.host_map[host]
             for l in host.links:
@@ -96,9 +88,7 @@ class ModelEncoder(object):
 
     # (G1) General rules for instances of flows
     # -------------------------------------------
-    def __encode_g1(self):
-        m = self.model
-
+    def __encode_g1(self, m):
         servers = [h for h in m.hosts if type(h) is Server]
         switches = [h for h in m.hosts if type(h) is Router]
 
@@ -119,9 +109,7 @@ class ModelEncoder(object):
 
     # (G2) Amplification factor constraints
     # -------------------------------------------
-    def __encode_g2(self):
-        m = self.model
-
+    def __encode_g2(self, m):
         for host in m.hosts:
             h = m.host_map[host]
 
@@ -137,9 +125,7 @@ class ModelEncoder(object):
 
     # (C1) Host sending and receiving capacities
     # -------------------------------------------
-    def __encode_c1(self):
-        m = self.model
-
+    def __encode_c1(self, m):
         for h in m.hosts:
             if h not in m.victims:
                 yield m.mk_units_recvd(h) <= h.receiving_cap
@@ -152,18 +138,17 @@ class ModelEncoder(object):
 
     # (C2) Link capacities
     # -------------------------------------------
-    def __encode_c2(self):
-        m = self.model
+    def __encode_c2(self, m):
         for l in m.links:
             if l not in m.victims:
                 yield m.mk_units_over_link(l) <= l.capacity
 
     @staticmethod
-    def __collect_assertions(*functions):
+    def __collect_assertions(m, *functions):
         assertions = []
         for f in functions:
             constraints = []
-            generator = f()
+            generator = f(m)
 
             if generator:
                 for c in generator:
@@ -178,7 +163,8 @@ class ModelEncoder(object):
     def get_assertions(self):
         m = self.model
 
-        a = self.__collect_assertions(self.__encode_f1, self.__encode_f2, self.__encode_f3, self.__encode_f4,
+        a = self.__collect_assertions(self.model,
+                                      self.__encode_f1, self.__encode_f2, self.__encode_f3, self.__encode_f4,
                                       self.__encode_g1, self.__encode_g2,
                                       self.__encode_c1, self.__encode_c2)
 
