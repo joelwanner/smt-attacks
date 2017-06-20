@@ -95,7 +95,10 @@ class NetworkRenderer(object):
                 if residual == l.capacity:
                     e.set_label(str(l.capacity))
                 else:
-                    e.set_label("%d/%d" % (residual, l.capacity))
+                    if residual % 1 == 0:  # integer residual
+                        e.set_label("%d/%d" % (residual, l.capacity))
+                    else:
+                        e.set_label("%.2f/%d" % (residual, l.capacity))
 
                 if residual <= 0:
                     e.set_color(self.light_color)
