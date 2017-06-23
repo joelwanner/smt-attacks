@@ -55,6 +55,7 @@ class NetworkChecker(object):
 
         try:
             s = file.read()
+            file.close()
             if verbose:
                 print(s)
 

@@ -35,22 +35,23 @@ class CoremeltTopology(Topology):
         hosts = []
         links = []
 
-        s1 = Router("S1", n*n + 1, n*n + 1)
-        s2 = Router("S2", n*n + 1, n*n + 1)
+        messages = n * n
+        s1 = Router("S1", messages, messages)
+        s2 = Router("S2", messages, messages)
         hosts.extend([s1, s2])
 
-        l = Link(s1, s2, n*n - 1)
+        l = Link(s1, s2, messages - 1)
         links.append(l)
         self.victim = l
 
         for i in range(n):
             a = Host("A" + str(i + 1), n, n)
             hosts.append(a)
-            links.append(Link(a, s1, n))
+            links.append(Link(a, s1, 2 * n))
 
             b = Host("B" + str(i + 1), n, n)
             hosts.append(b)
-            links.append(Link(s2, b, n))
+            links.append(Link(s2, b, 2 * n))
 
         super().__init__(hosts, links)
 
