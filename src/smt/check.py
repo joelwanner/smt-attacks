@@ -6,12 +6,13 @@ from smt.solve import *
 
 
 class AttackChecker:
-    def __init__(self, topology, n_flows, victims=None, links=None, attackers=None):
+    def __init__(self, topology, n_flows, victims=None, links=None, attackers=None, exhaustive=False):
         self.topology = topology
         self.n_flows = n_flows
         self.victims = victims
         self.target_links = links
         self.attackers = attackers
+        self.exhaustive = exhaustive
 
         self.attacks = []
         self.verbose = False
@@ -66,6 +67,9 @@ class AttackChecker:
                 print("Looking for attacks on %s" % potential_victims)
                 e = Network(self.topology, self.n_flows, potential_victims, potential_attackers)
                 attack = self.check_network(e)
+
+                if not self.exhaustive:
+                    return [attack]
 
                 if attack:
                     print("Potential victims: %s" % attack.victims)

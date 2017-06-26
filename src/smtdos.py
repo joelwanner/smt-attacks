@@ -72,10 +72,11 @@ if __name__ == '__main__':
 
         if args.generate == 'random':
             if os.environ['BRITE_PATH']:
-                n = int(input("Number of networks: "))
                 size = int(input("Number of hosts: "))
+                n = int(input("Number of networks: "))
                 try:
                     g.generate_random(n, size)
+                    g.generate_random(1, 12)
                 except ValueError:
                     print("Invalid arguments")
             else:
