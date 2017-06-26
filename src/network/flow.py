@@ -14,3 +14,9 @@ class Flow(object):
             return self.amount
         else:
             return 0
+
+    def __repr__(self):
+        return "%s: %d" % (self.route, self.amount)
+
+    def __str__(self):
+        return self.__repr__()
