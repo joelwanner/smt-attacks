@@ -10,19 +10,19 @@ class Generator(object):
 
     def __generate(self, cls, name, sizes):
         for n in sizes:
-            network = cls(n)
+            topology = cls(n)
             path = os.path.join(self.path, "%s%d.txt" % (name, n))
 
             with open(path, "w") as file:
-                file.write(network.__str__())
+                file.write(topology.__str__())
 
     def generate_random(self, n_networks, n_hosts):
         for n in range(n_networks):
-            network = RandomTopology(n_hosts)
+            topology = RandomTopology(n_hosts)
             path = os.path.join(self.path, "random%d.txt" % n)
 
             with open(path, "w") as file:
-                file.write(network.__str__())
+                file.write(topology.__str__())
 
     def generate_crafted(self, sizes):
         self.__generate(AmplificationNetwork, "amplification", sizes)

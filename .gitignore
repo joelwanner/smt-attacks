@@ -1,7 +1,9 @@
-**/.DS_STORE
-.idea
-
 out
 examples
 
+brite/last_seed_file
+brite/seed
+
 **/__pycache*
+.idea
+**/.DS_STORE
