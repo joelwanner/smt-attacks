@@ -75,11 +75,14 @@ class RandomTopology(Topology):
                 address = i % self.as_size
 
                 name = "%s%d" % (string.ascii_uppercase[as_id], address)
+                r = random.randint(3, 8)
+                s = random.randint(2, 5)
 
                 if address in chosen_servers[as_id]:
-                    h = Server(name, 1, 1, 2)
+                    a = random.randint(1, 6)
+                    h = Server(name, r * 3, s * 2, a)
                 else:
-                    h = Host(name, 1, 1)
+                    h = Host(name, r, s)
 
                 hosts.append(h)
                 node_map[i] = h
