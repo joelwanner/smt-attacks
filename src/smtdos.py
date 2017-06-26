@@ -72,20 +72,20 @@ if __name__ == '__main__':
 
         if args.generate == 'random':
             if os.environ['BRITE_PATH']:
-                size = input("Number of hosts: ")
-                n = input("Number of networks: ")
+                n = int(input("Number of networks: "))
+                size = int(input("Number of hosts: "))
                 try:
-                    g.generate_random(int(n), int(size))
+                    g.generate_random(n, size)
                 except ValueError:
                     print("Invalid arguments")
             else:
                 print("Environment variable BRITE_PATH is not set. Please point it to a working BRITE binary.")
 
         elif args.generate == 'crafted':
-            lower = input("Smallest size: ")
-            upper = input("Largest size: ")
+            lower = int(input("Smallest size: "))
+            upper = int(input("Largest size: "))
             try:
-                g.generate_crafted(range(int(lower), int(upper) + 1))
+                g.generate_crafted(range(lower, upper + 1))
             except ValueError:
                 print("Invalid arguments")
 
