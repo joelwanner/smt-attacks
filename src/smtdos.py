@@ -108,6 +108,8 @@ if __name__ == '__main__':
                 upper = int(input("Largest size: "))
                 b.run_examples(range(lower, upper + 1))
 
+            print("Benchmark output stored in %s" % b.logfile)
+
         except ValueError:
             print("Input is not a number")
 

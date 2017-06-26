@@ -11,6 +11,7 @@ class Benchmark(object):
         self.ac_cls = ac_cls
         self.n_runs = n_runs
         self.out_path = output_path
+        self.logfile = output_path
 
     def run_files(self, directory):
         with self.create_logfile() as logfile:
@@ -84,6 +85,7 @@ class Benchmark(object):
                 file = os.path.join(self.out_path, "benchmark%d.txt" % i)
                 i += 1
 
+            self.logfile = file
             return open(file, 'w')
         else:
             return open(self.out_path, 'w')

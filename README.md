@@ -1,7 +1,8 @@
 # SMTDoS
 
 SMTDoS is a tool to find possible Denial-of-Service attacks in networks using the Z3 theorem prover.
-This is the code repository for the thesis *An SMT-Based Approach to Synthesizing Unknown Network Attacks*.
+This is the code repository for the thesis
+*An SMT-Based Approach to Synthesizing Unknown Network Attacks*.
 
 ## Getting Started
 
@@ -10,13 +11,19 @@ This is the code repository for the thesis *An SMT-Based Approach to Synthesizin
 SMTDoS requires Python 3.
 
 The application relies on the [Z3](http://z3prover.github.io) theorem prover.
-In order to install Z3, follow the [instructions](https://github.com/Z3Prover/z3#python) in the Github repository for the python bindings.
+In order to install Z3, follow the [instructions](https://github.com/Z3Prover/z3#python)
+in the Github repository for the Python bindings.
 
-[NetworkX](http://networkx.github.io) is used to generate networks, which are visualized using [pydot](https://github.com/erocarrera/pydot).
+We use [BRITE](https://www.cs.bu.edu/brite) to generate random topologies.
+BRITE is no longer supported, but a forked version can be obtained on
+[Github](https://github.com/joelwanner/brite-patch).
+
+Network attacks are visualized using [pydot](https://github.com/erocarrera/pydot),
+which is a Python interface to the DOT graph description language.
 
 ### Usage
 
-Clone the repository to install SMTAX.
+No further installation is required upon cloning the repository and installing the required dependencies.
 
 For a list of commands, use
 
@@ -29,7 +36,8 @@ python src/smtdos.py --help
 Generate network files for benchmarking and run them using the following commands:
 
 ```
-python src/smtdos.py --generate
+python src/smtdos.py --generate crafted
+python src/smtdos.py --generate random
 python src/smtdos.py --benchmark
 ```
 
@@ -43,4 +51,5 @@ Supervised by
 
 ## License
 
-This project is licensed under the MIT License – see the [LICENSE.txt](LICENSE.txt) file for details
+This project is licensed under the MIT License – see the [LICENSE.txt](LICENSE.txt) file for details.
+Third-party licenses are included in the [LICENSES.txt](LICENSES.txt) file.
