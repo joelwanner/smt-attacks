@@ -21,9 +21,6 @@ class ModelDecoder(object):
         v = self.model
         flows = []
 
-        for h in m.hosts:
-            sent = m.mk_units_sent(h)
-
         for f in m.flows:
             fid = v.evaluate(m.Flow.id(f))
             size = v.evaluate(m.Flow.size(f)).as_long()

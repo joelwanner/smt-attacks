@@ -139,12 +139,13 @@ class ModelEncoder(object):
             for h in m.hosts:
                 if h not in m.victims:
                     yield m.mk_units_recvd(h, t) <= h.receiving_cap
-                    yield m.mk_units_sent(h, t) <= h.sending_cap
                 else:
-                    if len(m.victims) == 1:
-                        yield m.mk_units_sent(h, t) == 0  # Passive victims
-                    else:
-                        yield True
+                    yield True
+
+                if h in m.victims and len(m.victims) == 1:
+                    yield m.mk_units_sent(h, t) == 0  # Passive victims
+                else:
+                    yield m.mk_units_sent(h, t) <= h.sending_cap
 
     # (S3) Link capacities
     # -------------------------------------------
