@@ -76,7 +76,6 @@ if __name__ == '__main__':
                 n = int(input("Number of networks: "))
                 try:
                     g.generate_random(n, size)
-                    g.generate_random(1, 12)
                 except ValueError:
                     print("Invalid arguments")
             else:

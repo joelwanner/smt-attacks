@@ -21,6 +21,9 @@ class RandomTopology(Topology):
 
         self.n_systems = int(math.floor(math.sqrt(n)))
         self.as_size = n // self.n_systems
+        print(n)
+        print(math.sqrt(n))
+        print(self.n_systems)
 
         config = config.replace("<N_AS>", str(self.n_systems))
         config = config.replace("<AS_SIZE>", str(self.as_size))
@@ -74,12 +77,12 @@ class RandomTopology(Topology):
                 as_id = i // self.as_size
                 address = i % self.as_size
 
-                name = "%s%d" % (string.ascii_uppercase[as_id], address)
+                name = "%s%d" % (string.ascii_uppercase[as_id], address + 1)
                 r = random.randint(3, 8)
                 s = random.randint(2, 5)
 
                 if address in chosen_servers[as_id]:
-                    a = random.randint(1, 6)
+                    a = random.randint(2, 6)
                     h = Server(name, r * 3, s * 2, a)
                 else:
                     h = Host(name, r, s)
