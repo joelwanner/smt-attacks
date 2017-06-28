@@ -68,10 +68,10 @@ class AttackChecker:
                 e = Network(self.topology, self.n_flows, potential_victims, potential_attackers)
                 attack = self.check_network(e)
 
-                if not self.exhaustive:
-                    return [attack]
-
                 if attack:
+                    if not self.exhaustive:
+                        return [attack]
+
                     print("Potential victims: %s" % attack.victims)
                     host_victims = [v for v in attack.victims if isinstance(v, Host)]
                     amplifying_victims = [h for h in host_victims if isinstance(h, Server) or h.amp_factor > 1]
