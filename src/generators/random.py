@@ -96,16 +96,12 @@ class RandomTopology(Topology):
                     attrs = line.split(' ')
                     src_id = int(attrs[1])
                     dest_id = int(attrs[2])
+                    capacity = float(attrs[5])
 
                     src = node_map[src_id]
                     dest = node_map[dest_id]
 
-                    if src_id // self.as_size == dest_id // self.as_size:
-                        c = random.randint(1, 10)
-                    else:
-                        c = random.randint(10, 20)
-
-                    l = Link(src, dest, c)
+                    l = Link(src, dest, int(capacity))
                     links.append(l)
 
             return hosts, links
