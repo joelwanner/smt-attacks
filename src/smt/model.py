@@ -63,6 +63,3 @@ class Model(object):
 
     def mk_units_recvd(self, h):
         return Sum([self.mk_units_sent_to(l.neighbor(h), h) for l in h.links])
-
-    def mk_units_over_link(self, l):
-        return self.mk_units_sent_to(l.h1, l.h2) + self.mk_units_sent_to(l.h2, l.h1)

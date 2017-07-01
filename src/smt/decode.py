@@ -21,9 +21,6 @@ class ModelDecoder(object):
         v = self.model
         flows = []
 
-        for h in m.hosts:
-            sent = m.mk_units_sent(h)
-
         for f in m.flows:
             fid = v.evaluate(m.Flow.id(f))
             size = v.evaluate(m.Flow.size(f)).as_long()
@@ -47,8 +44,9 @@ class ModelDecoder(object):
                 victims.append(h)
 
         for l in self.network.links:
-            s = self.network.mk_units_over_link(l)
-            if self.model.evaluate(And(s > l.capacity)):  # Hack to prevent AttributeError from Z3
+            s1 = self.network.mk_units_sent_to(l.h1, l.h2)
+            s2 = self.network.mk_units_sent_to(l.h2, l.h1)
+            if self.model.evaluate(Or(s1 > l.capacity, s2 > l.capacity)):
                 victims.append(l)
 
         return victims

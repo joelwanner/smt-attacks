@@ -90,19 +90,6 @@ class NetworkRenderer(object):
             if self.network.flows:
                 f1 = sum([f.get(l.h1, l.h2) for f in self.network.flows])
                 f2 = sum([f.get(l.h2, l.h1) for f in self.network.flows])
-                residual = l.capacity - f1 - f2
-
-                if residual == l.capacity:
-                    e.set_label(str(l.capacity))
-                else:
-                    if residual % 1 == 0:  # integer residual
-                        e.set_label("%d/%d" % (residual, l.capacity))
-                    else:
-                        e.set_label("%.2f/%d" % (residual, l.capacity))
-
-                if residual <= 0:
-                    e.set_color(self.light_color)
-                    e.set_fontcolor(self.light_color)
 
                 if f1 > 0:
                     g.add_edge(self.__create_link_flow(v1, v2, f1))
