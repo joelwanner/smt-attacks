@@ -74,7 +74,7 @@ class AttackChecker:
 
                     print("Potential victims: %s" % attack.victims)
                     host_victims = [v for v in attack.victims if isinstance(v, Host)]
-                    amplifying_victims = [h for h in host_victims if isinstance(h, Server) or h.amp_factor > 1]
+                    amplifying_victims = [h for h in host_victims if isinstance(h, Server)]
 
                     if len(host_victims) == 1 or not amplifying_victims:
                         self.attacks.append(attack)
