@@ -11,7 +11,7 @@ import max_flow.check
 
 EXAMPLES_PATH = "examples/"
 OUTPUT_PATH = "out/"
-DEFAULT_N_FLOWS = 10
+DEFAULT_N_FLOWS = 6
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
