@@ -34,6 +34,7 @@ class NetworkChecker(object):
                     path = "%sattack%d" % (out_prefix, i + 1)
                     nr = NetworkRenderer(a)
                     nr.render(path)
+                    nr.write_dot(path)
                     print("Attack rendering is located at:\n%s.pdf" % path)
             else:
                 nr = NetworkRenderer(Network(self.checker.topology, 0))
