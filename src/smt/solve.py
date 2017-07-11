@@ -20,7 +20,7 @@ class SmtSolver(object):
         s.set('smt.restart_factor', 1.5)  # Increase restart threshold multiplication factor (geometric progression)
         s.set('smt.arith.random_initial_value', True)  # Use random initial values in procedure for linear arithmetic
         # TODO: investigate performance with case_split option
-        # s.set('smt.case_split', 3)        # Case split based on relevancy (structural splitting)
+        s.set('smt.case_split', 3)        # Case split based on relevancy (structural splitting)
         s.set('smt.delay_units', True)    # Prevent Z3 from restarting when a unit clause is learned
         s.set('sk_hack', True)            # Enable hack for VCC
         s.set('smt.qi.eager_threshold', 100.0)  # Increase threshold for eager quantifier instantiation (default: 10.0)

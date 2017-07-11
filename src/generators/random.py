@@ -61,6 +61,7 @@ class RandomTopology(Topology):
             super().__init__(hosts, links)
         except subprocess.CalledProcessError:
             print("Error generating BRITE topology")
+            os.remove(tmp_conf)
             super().__init__([], [])
 
     def parse_brite_file(self, path):
