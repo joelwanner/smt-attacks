@@ -6,6 +6,8 @@ from actions.check import NetworkChecker
 from generators.crafted import AmplificationNetwork, CoremeltNetwork
 
 
+DEFAULT_N_FLOWS = 6
+
 class Benchmark(object):
     def __init__(self, output_path, ac_cls, n_runs):
         self.ac_cls = ac_cls
@@ -29,7 +31,7 @@ class Benchmark(object):
                     runs = []
                     for k in range(self.n_runs):
                         checker = NetworkChecker.from_file(os.path.join(directory, filename), self.ac_cls,
-                                                           10, render=False, verbose=False)
+                                                           DEFAULT_N_FLOWS, render=False, verbose=False)
 
                         start_time = time.time()
                         checker.check_attack(out_path=None)
