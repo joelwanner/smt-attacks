@@ -23,6 +23,7 @@ class Benchmark(object):
             files = os.listdir(directory)
             n = len(files)
 
+            runtimes = []
             for i, filename in enumerate(files):
                 if filename.endswith(".txt"):
                     print()
@@ -37,8 +38,10 @@ class Benchmark(object):
                         checker.check_attack(out_path=None)
                         runs.append(time.time() - start_time)
 
-                    runtime_str = ", ".join(["%.3f" % r for r in runs])
-                    logfile.write("%s: %s\n" % (filename, runtime_str))
+                    runtimes.extend(runs)
+
+            runtime_str = ", ".join(["%.3f" % r for r in runtimes])
+            logfile.write("[%s]\n" % runtime_str)
 
     def run_examples(self, sizes):
         with self.create_logfile() as logfile:
