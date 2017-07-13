@@ -56,17 +56,14 @@ if __name__ == '__main__':
         if not os.path.exists(EXAMPLES_PATH):
             os.makedirs(EXAMPLES_PATH)
 
-        clear = input("Remove existing examples? (y/N) ")
-
-        if clear == 'y' or clear == 'Y':
-            # Delete previous examples
-            for f in os.listdir(EXAMPLES_PATH):
-                path = os.path.join(EXAMPLES_PATH, f)
-                try:
-                    if os.path.isfile(path):
-                        os.unlink(path)
-                except OSError as e:
-                    pass
+        # Delete previous examples
+        for f in os.listdir(EXAMPLES_PATH):
+            path = os.path.join(EXAMPLES_PATH, f)
+            try:
+                if os.path.isfile(path):
+                    os.unlink(path)
+            except OSError as e:
+                pass
 
         g = Generator(EXAMPLES_PATH)
 
@@ -74,8 +71,9 @@ if __name__ == '__main__':
             if 'BRITE_PATH' in os.environ:
                 size = int(input("Number of hosts: "))
                 n = int(input("Number of networks: "))
+                c = int(input("Connectivity: "))
                 try:
-                    g.generate_random(n, size)
+                    g.generate_random(n, size, c)
                 except ValueError:
                     print("Invalid arguments")
             else:
@@ -113,7 +111,8 @@ if __name__ == '__main__':
             print("Input is not a number")
 
     if args.random:
-        network = RandomTopology(int(args.random))
-        checker = Checker(network, 10)
+        c = int(input("Connectivity: "))
+        network = RandomTopology(int(args.random), c)
+        checker = Checker(network, DEFAULT_N_FLOWS)
         nc = NetworkChecker(checker, "random", verbose=args.debug)
         nc.check_attack(output)

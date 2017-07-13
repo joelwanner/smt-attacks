@@ -16,9 +16,9 @@ class Generator(object):
             with open(path, "w") as file:
                 file.write(topology.__str__())
 
-    def generate_random(self, n_networks, n_hosts):
+    def generate_random(self, n_networks, n_hosts, connectivity):
         for n in range(n_networks):
-            topology = RandomTopology(n_hosts)
+            topology = RandomTopology(n_hosts, connectivity)
             path = os.path.join(self.path, "random%d.txt" % n)
 
             with open(path, "w") as file:

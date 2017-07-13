@@ -18,20 +18,17 @@ SEED_DEFAULT = "seed.default"
 
 
 class RandomTopology(Topology):
-    def __init__(self, n):
+    def __init__(self, n, connectivity):
         with open(os.path.join(BRITE_DIRECTORY, CONF_DEFAULT), 'r') as f:
             config = f.read()
 
-        n_routers = n // 2
-        self.n_systems = int(math.floor(math.sqrt(n_routers)))
-        self.as_size = n_routers // self.n_systems
-        self.n_routers = self.n_systems * self.as_size
-        self.n_clients = n - self.n_routers
+        n_routers = n * 3 // 5
+        self.n_clients = n - n_routers
 
         # Configure BRITE
         # ------------------
-        config = config.replace("<N_AS>", str(self.n_systems))
-        config = config.replace("<AS_SIZE>", str(self.as_size))
+        config = config.replace("<N_ROUTERS>", str(n_routers))
+        config = config.replace("<CONNECTIVITY>", str(connectivity))
 
         tmp_conf = os.path.join(BRITE_DIRECTORY, CONF_FILE)
         with open(tmp_conf, 'w') as f:
@@ -72,33 +69,39 @@ class RandomTopology(Topology):
             node_str = paragraphs[1]
             edge_str = paragraphs[2]
 
-            node_map = {}
+            node_id_map = {}
             routers = []
             links = []
 
-            systems = [[]] * self.n_systems
+            autonomous_systems = {}
+            as_sizes = {}
 
             # Parse BRITE nodes
             for line in node_str.split('\n')[1:]:
                 attrs = line.split(' ')
-
                 i = int(attrs[0])
-                as_id = i // self.as_size
-                address = i % self.as_size
+                as_id = int(attrs[5])
 
-                name = "%s%d" % (string.ascii_uppercase[as_id], address + 1)
+                if as_id not in as_sizes:
+                    as_sizes[as_id] = 0
+                    autonomous_systems[as_id] = []
+
+                internal_address = as_sizes[as_id]
+                as_sizes[as_id] += 1
+
+                name = "%s%d" % (string.ascii_uppercase[as_id], internal_address + 1)
                 r = random.randint(30, 100)
                 s = random.randint(10, 100)
 
-                if random.randint(0, 3) == 0:
+                if random.randint(0, 2) == 0:
                     a = random.randint(5, 40)
                     h = Server(name, r, s, a)
                 else:
                     h = Router(name, r, s)
 
                 routers.append(h)
-                node_map[i] = h
-                systems[as_id].append(h)
+                node_id_map[i] = h
+                autonomous_systems[as_id].append(h)
 
             hosts = copy(routers)
 
@@ -108,12 +111,18 @@ class RandomTopology(Topology):
                     attrs = line.split(' ')
                     src_id = int(attrs[1])
                     dest_id = int(attrs[2])
-                    capacity = float(attrs[5])
+                    src_as = int(attrs[6])
+                    dest_as = int(attrs[7])
+                    capacity = int(float(attrs[5]))
 
-                    src = node_map[src_id]
-                    dest = node_map[dest_id]
+                    src = node_id_map[src_id]
+                    dest = node_id_map[dest_id]
 
-                    l = Link(src, dest, int(capacity))
+                    # Inter-AS edges are assigned larger capacities
+                    if src_as != dest_as:
+                        capacity = random.randint(70, 200)
+
+                    l = Link(src, dest, capacity)
                     links.append(l)
 
             # Create clients
