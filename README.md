@@ -1,8 +1,7 @@
 # SMTDoS
 
-SMTDoS is a tool to find possible Denial-of-Service attacks in networks using the Z3 theorem prover.
-This is the code repository for the thesis
-*An SMT-Based Approach to Synthesizing Unknown Network Attacks*.
+SMTDoS is a tool capable of finding possible Denial-of-Service attacks
+in networks using an SMT-based approach.
 
 ## Getting Started
 
@@ -15,7 +14,7 @@ In order to install Z3, follow the [instructions](https://github.com/Z3Prover/z3
 in the Github repository for the Python bindings.
 
 We use [BRITE](https://www.cs.bu.edu/brite) to generate random topologies.
-BRITE is no longer supported, but a forked version can be obtained on
+BRITE is no longer supported, but a patched version can be obtained on
 [Github](https://github.com/joelwanner/brite-patch).
 
 Network attacks are visualized using [pydot](https://github.com/erocarrera/pydot),
@@ -38,7 +37,7 @@ Generate network files for benchmarking and run them using the following command
 ```
 python src/smtdos.py --generate crafted
 python src/smtdos.py --generate random
-python src/smtdos.py --benchmark
+python src/smtdos.py --benchmark examples
 ```
 
 ## Authors
