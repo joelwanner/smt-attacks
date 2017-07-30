@@ -90,11 +90,11 @@ class RandomTopology(Topology):
                 as_sizes[as_id] += 1
 
                 name = "%s%d" % (string.ascii_uppercase[as_id], internal_address + 1)
-                r = random.randint(30, 100)
+                r = random.randint(200, 400)
                 s = random.randint(10, 100)
 
                 if random.randint(0, 2) == 0:
-                    a = random.randint(5, 40)
+                    a = random.randint(5, 10)
                     h = Server(name, r, s, a)
                 else:
                     h = Router(name, r, s)
@@ -127,7 +127,7 @@ class RandomTopology(Topology):
 
             # Create clients
             for i in range(self.n_clients):
-                client = Host(str(i + 1), random.randint(5, 40), random.randint(1, 10))
+                client = Host(str(i + 1), random.randint(30, 40), random.randint(1, 2))
                 router = random.choice(routers)
                 hosts.append(client)
 
