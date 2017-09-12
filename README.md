@@ -1,7 +1,7 @@
 # SMTDoS
 
-SMTDoS is a tool capable of finding possible Denial-of-Service attacks
-in networks using an SMT-based approach.
+SMTDoS is a tool designed to find potential Denial-of-Service attacks
+in given network topologies using an SMT-based approach.
 
 ## Getting Started
 
@@ -13,12 +13,12 @@ The application relies on the [Z3](http://z3prover.github.io) theorem prover.
 In order to install Z3, follow the [instructions](https://github.com/Z3Prover/z3#python)
 in the Github repository for the Python bindings.
 
-We use [BRITE](https://www.cs.bu.edu/brite) to generate random topologies.
-BRITE is no longer supported, but a patched version can be obtained on
+[BRITE](https://www.cs.bu.edu/brite) is required for generating internet-like topologies.
+Although it is no longer supported, a patched version can be obtained on
 [Github](https://github.com/joelwanner/brite-patch).
 
 Network attacks are visualized using [pydot](https://github.com/erocarrera/pydot),
-which is a Python interface to the DOT graph description language.
+a Python interface to Graphviz.
 
 ### Usage
 

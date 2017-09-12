@@ -5,8 +5,9 @@ import interface.log as log
 from actions.check import NetworkChecker
 from generators.crafted import AmplificationNetwork, CoremeltNetwork
 
-
+# TODO: Reduce redundancy
 DEFAULT_N_FLOWS = 6
+
 
 class Benchmark(object):
     def __init__(self, output_path, ac_cls, n_runs):
@@ -15,6 +16,7 @@ class Benchmark(object):
         self.out_path = output_path
         self.logfile = output_path
 
+    # TODO: Improve output format
     def run_files(self, directory):
         with self.create_logfile() as logfile:
             logfile.write("Runtimes\n-------------------\n")

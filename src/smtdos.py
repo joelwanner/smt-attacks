@@ -17,8 +17,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-f', '--file')
-    parser.add_argument('-e', '--example', help="run a network from the examples directory")
-    parser.add_argument('-g', '--generate', choices=['random', 'crafted'])
+    parser.add_argument('-e', '--example', help="run using a topology from the examples directory")
+    parser.add_argument('-g', '--generate', choices=['random', 'crafted'], help="generate an example topology")
     parser.add_argument('-b', '--benchmark', choices=['examples', 'crafted'])
     parser.add_argument('-r', '--random')
 
@@ -55,15 +55,6 @@ if __name__ == '__main__':
     if args.generate:
         if not os.path.exists(EXAMPLES_PATH):
             os.makedirs(EXAMPLES_PATH)
-
-        # Delete previous examples
-        for f in os.listdir(EXAMPLES_PATH):
-            path = os.path.join(EXAMPLES_PATH, f)
-            try:
-                if os.path.isfile(path):
-                    os.unlink(path)
-            except OSError as e:
-                pass
 
         g = Generator(EXAMPLES_PATH)
 
