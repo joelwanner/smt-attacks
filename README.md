@@ -7,7 +7,7 @@ in given network topologies using an SMT-based approach.
 
 ### Dependencies
 
-SMTDoS requires Python 3.
+Python 3 is recommended for running SMTDoS.
 
 The application relies on the [Z3](http://z3prover.github.io) theorem prover.
 In order to install Z3, follow the [instructions](https://github.com/Z3Prover/z3#python)
@@ -27,18 +27,29 @@ No further installation is required upon cloning the repository and installing t
 For a list of commands, use
 
 ```
-python src/smtdos.py --help
+python3 src/smtdos.py --help
 ```
 
-### Benchmarks
+### Benchmarking
 
-Generate network files for benchmarking and run them using the following commands:
+Generate example network files for benchmarking and run them using the following commands:
 
 ```
-python src/smtdos.py --generate crafted
-python src/smtdos.py --generate random
-python src/smtdos.py --benchmark examples
+python3 src/smtdos.py --generate crafted
+python3 src/smtdos.py --generate random
+python3 src/smtdos.py --benchmark examples
 ```
+
+### Custom Topologies
+
+To run the application on a custom topology, create a file that contains the topology description
+and use the following command:
+
+```
+python3 src/smtdos.py -f [path-to-topology]
+```
+
+See examples for the structure of topology descriptions.
 
 ## Authors
 
