@@ -4,7 +4,6 @@ from shutil import copyfile
 from copy import copy
 
 import string
-import math
 import random
 
 from network.topology import *
@@ -38,8 +37,12 @@ class RandomTopology(Topology):
         if not os.path.exists(seed_path):
             copyfile(os.path.join(BRITE_DIRECTORY, SEED_DEFAULT), seed_path)
 
-        brite = os.environ['BRITE_PATH']
-        args = [brite, CONF_FILE, TMP_FILE, SEED_FILE]
+        if 'BRITE' in os.environ:
+            brite_bin = os.environ['BRITE']
+        else:
+            brite_bin = "brite"
+
+        args = [brite_bin, CONF_FILE, TMP_FILE, SEED_FILE]
         dev_null = open("/dev/null", 'w')
         print("> %s" % " ".join(args))
 
@@ -47,7 +50,6 @@ class RandomTopology(Topology):
             # Run BRITE
             # ------------------
             subprocess.check_call(args, env=os.environ, cwd=BRITE_DIRECTORY, stdout=dev_null)
-            os.remove(tmp_conf)
             dev_null.close()
 
             output = os.path.join(BRITE_DIRECTORY, TMP_FILE)
@@ -56,10 +58,14 @@ class RandomTopology(Topology):
             os.remove(brite_file)
 
             super().__init__(hosts, links)
-        except subprocess.CalledProcessError:
-            print("Error generating BRITE topology")
-            os.remove(tmp_conf)
+        except FileNotFoundError:
+            print("BRITE binary was not found. Add it to the path or set the BRITE environment variable")
             super().__init__([], [])
+        except subprocess.CalledProcessError:
+            print("BRITE error")
+            super().__init__([], [])
+        finally:
+            os.remove(tmp_conf)
 
     def parse_brite_file(self, path):
         with open(path, 'r') as f:

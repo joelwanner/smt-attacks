@@ -8,22 +8,18 @@ class Generator(object):
     def __init__(self, path):
         self.path = path
 
-    def __generate(self, cls, name, sizes):
-        for n in sizes:
-            topology = cls(n)
-            path = os.path.join(self.path, "%s%d.txt" % (name, n))
+    def __generate(self, cls, name, ids, params):
+        for i, p in enumerate(zip(*params)):
+            topology = cls(*p)
+            path = os.path.join(self.path, "%s%d.txt" % (name, ids[i]))
 
             with open(path, "w") as file:
                 file.write(topology.__str__())
+                print("Generated %s" % path)
 
     def generate_random(self, n_networks, n_hosts, connectivity):
-        for n in range(n_networks):
-            topology = RandomTopology(n_hosts, connectivity)
-            path = os.path.join(self.path, "random%d.txt" % n)
-
-            with open(path, "w") as file:
-                file.write(topology.__str__())
+        self.__generate(RandomTopology, "random", range(n_networks), [[n_hosts]*n_networks, [connectivity]*n_networks])
 
     def generate_crafted(self, sizes):
-        self.__generate(AmplificationNetwork, "amplification", sizes)
-        self.__generate(CoremeltNetwork, "coremelt", sizes)
+        self.__generate(AmplificationNetwork, "amplification", sizes, [sizes])
+        self.__generate(CoremeltNetwork, "coremelt", sizes, [sizes])

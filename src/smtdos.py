@@ -68,16 +68,13 @@ if __name__ == '__main__':
         g = Generator(EXAMPLES_PATH)
 
         if args.generate == 'random':
-            if 'BRITE_PATH' in os.environ:
-                size = int(input("Number of hosts: "))
-                n = int(input("Number of networks: "))
-                c = int(input("Connectivity: "))
-                try:
-                    g.generate_random(n, size, c)
-                except ValueError:
-                    print("Invalid arguments")
-            else:
-                print("Environment variable BRITE_PATH is not set. Please point it to a BRITE binary")
+            size = int(input("Number of hosts: "))
+            n = int(input("Number of networks: "))
+            c = int(input("Connectivity: "))
+            try:
+                g.generate_random(n, size, c)
+            except ValueError:
+                print("Invalid arguments")
 
         elif args.generate == 'crafted':
             lower = int(input("Smallest size: "))
